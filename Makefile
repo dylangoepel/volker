@@ -1,5 +1,5 @@
 cc := clang
-cflags := -pthread -Wall -lgmp
+cflags := -pthread -Wall -lgmp -Wunused-command-line-argument
 
 objs := $(shell find src -iname '*.c' | sed "s,src,obj,g; s,c$$,o,g")
 
