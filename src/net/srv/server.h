@@ -1,4 +1,4 @@
-#indef SERVER_H
+#ifndef SERVER_H
 #define SERVER_H
 
 struct sockaddr_in srv, newconn;
