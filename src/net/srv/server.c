@@ -11,12 +11,6 @@
 #define INC_MSSG_BUFFER 1000
 
 
-struct sockaddr_in srv, newconn;
-void *conneclient_handler(void *);
-void server(int port);
-int sock_desc, new_socket, *new_sock;
-
-
 //The error handling is bs but i dont care 
 //This is not final!!!
 
@@ -66,11 +60,12 @@ void server(int port){
 					 }
 		}
 
-					 if (new_socket<0)
-						    {
-						        perror("accept failed");
+					
+			         if (new_socket<0)
+						  {
+						    perror("accept failed");
 						        
-						    }
+						  {
 }
 
 
