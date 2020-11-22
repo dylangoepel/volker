@@ -1,10 +1,12 @@
 cc := clang
-cflags := -pthread -Wall -lgmp -Wunused-command-line-argument
+coflags :=
+cbflags := -pthread -lgmp
 
 objs := $(shell find src -iname '*.c' | sed "s,src,obj,g; s,c$$,o,g")
 
-.PHONY: all clean
+.PHONY: all objects clean
 
+objects: $(objs)
 all: $(objs) bin/volker
 
 clean:
@@ -13,8 +15,8 @@ clean:
 
 obj/%.o: src/%.c
 	mkdir -p $(shell dirname $< | sed 's,src,obj,g')
-	$(cc) $(cflags) -c -o $@ $<
+	$(cc) $(coflags) -c -o $@ $<
 
 bin/volker: $(objs)
 	mkdir -p bin
-	$(cc) $(cflags) -o $@ $^
+	$(cc) $(cbflags) -o $@ $^
