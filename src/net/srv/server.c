@@ -9,7 +9,6 @@
 #include "server.h"
 
 //doesnt matter as long it is not taken
-#define PORT 8080
 #define INC_MSSG_BUFFER 1000
 #define QUEUE_SIZE 10
 
@@ -29,7 +28,7 @@ int srv_init(srv_ctx *server, int port, int threads) {
     // initialize local sockaddr_in
     server->local.sin_family = AF_INET; // IPv4. TODO: add IPv6 support
     server->local.sin_addr.s_addr = htonl(INADDR_ANY); // no subnet filter (0.0.0.0)
-    server->local.sin_port =  port;
+    server->local.sin_port =  htons(port);
     bzero(server->local.sin_zero, sizeof(server->local.sin_zero));
 
     // create listener socket
