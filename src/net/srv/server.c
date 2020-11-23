@@ -7,6 +7,8 @@
 #include <errno.h>
 //needs to be changed 
 #include "server.h"
+/*needs to be corrected*/
+#include "/src/tpool/tpool.h"
 
 //doesnt matter as long it is not taken
 #define INC_MSSG_BUFFER 1000
@@ -47,10 +49,13 @@ int srv_init(srv_ctx *server, int port, int threads) {
 }
 
 // start listener and run handler on incoming connections
-int srv_listen(srv_ctx *server, void *(*handler)(void *)) {
+int srv_listen(srv_ctx *server, void(*handler)(void *)) {
     int sock;
     struct sockaddr_in addr;
     socklen_t len = sizeof(struct sockaddr_in);
+    tpool_t main_pool; //pool name
+
+    tpool_init(&main_pool, 20, 40) /*init the pool and creates 20 threads*/
 
     // listen on socket
     if(listen(server->listener, QUEUE_SIZE) < 0) {
@@ -69,9 +74,9 @@ int srv_listen(srv_ctx *server, void *(*handler)(void *)) {
         }
 
         client->socket = sock;
-        memcpy(&client->remote, &addr, sizeof(struct sockaddr_in));
+        /*puts new connection to the list*/
 
-        if (pthread_create(&client_thread, NULL, handler, client) < 0) {
+        if (tpool_add_work(main_pool, handler, handler, client) < 0) {
             printf("[\e[31mERROR\e[00m] Unable to create thread: %s\n", strerror(errno));
             continue;
         }
