@@ -72,6 +72,10 @@ void tpool_init(tpool_t *tpoolp, size_t num, size_t max_queue_size)
       perror("pthread_create"); 
       exit(0); 
     } 
+    else if (pthread_detach(pool->tpid[i]) != 0) { 
+      perror("pthread_detach"); 
+      exit(0); 
+    } 
    } 
  
   *tpoolp = pool; 
