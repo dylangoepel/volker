@@ -4,105 +4,79 @@
 #include <netinet/in.h> 
 #include <pthread.h>
 #include <string.h>
+#include <errno.h>
 //needs to be changed 
 #include "server.h"
+
 //doesnt matter as long it is not taken
 #define PORT 8080
 #define INC_MSSG_BUFFER 1000
+#define QUEUE_SIZE 10
 
+// TODO: outsource error handling
 
-//The error handling is bs but i dont care 
-//This is not final!!!
+// initialize and prepare a srv_ctx for listening
+int srv_init(srv_ctx *server, int port, int threads) {
+    // initialize thread array
+    server->thread_count = threads;
+    server->threads = malloc(sizeof(pthread_t) * threads);
+    if(server->threads == NULL) {
+        printf("[\e[31mERROR\e[00m] Unable to allocate memory.\n");
+        return -1;
+    }
+    bzero(server->threads, sizeof(pthread_t) * threads);
 
-//main server driver function
-void server(int port){
+    // initialize local sockaddr_in
+    server->local.sin_family = AF_INET; // IPv4. TODO: add IPv6 support
+    server->local.sin_addr.s_addr = htonl(INADDR_ANY); // no subnet filter (0.0.0.0)
+    server->local.sin_port =  port;
+    bzero(server->local.sin_zero, sizeof(server->local.sin_zero));
 
-		bzero((char*)&srv, sizeof(srv)); //first byte with null
+    // create listener socket
+    if((server->listener = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        printf("[\e[31mERROR\e[00m] Unable to create listener socket: %s\n", strerror(errno));
+        return -1;
+    }
 
-		/* Assign ip ...*/
-		srv.sin_family = AF_INET;
-		srv.sin_addr.s_addr = htonl(INADDR_ANY); //is best 
-		srv.sin_port =  PORT;
-		sock_desc = socket(AF_INET, SOCK_STREAM, 0); //create socket
+    // bind socket
+    if(bind(server->listener, (struct sockaddr*)&(server->local), sizeof(struct sockaddr_in)) < 0) {
+        printf("[\e[31mERROR\e[00m] Unable to bind listener socket: %s\n", strerror(errno));
+        return -1;
+    }
 
-		if (sock_desc == -1)
-		{
-
-			printf("error , could not create socket\n");
-			
-
-		}
-
-		if (bind(sock_desc, (struct sockaddr*)&srv, sizeof(srv)) != 0) //bind socket and check if an error exists
-			{
-				printf("error ...\n");
-
-			}
-
-		listen(sock_desc, 5);
-
-		
-		socklen_t newconn_buffer = sizeof(newconn);
-
-		while(new_socket == accept(sock_desc, (struct sockaddr*)&newconn, &newconn_buffer))
-		{
-			pthread_t clientconn_thread;
-
-				new_sock = malloc(1);
-				*new_sock = new_socket;
-
-				/* create a new thread for each new client which is bs!!! but i will fix it later*/
-				if (pthread_create(&clientconn_thread, NULL, conneclient_handler, (void *)new_sock) < 0) 
-					 {
-
-					 	printf("error");
-
-					 }
-		}
-
-					
-			         if (new_socket<0)
-						  {
-						    perror("accept failed");
-						        
-						  {
+    return 0;
 }
 
+// start listener and run handler on incoming connections
+int srv_listen(srv_ctx *server, void *(*handler)(void *)) {
+    int sock;
+    struct sockaddr_in addr;
+    socklen_t len = sizeof(struct sockaddr_in);
 
-void *conneclient_handler(void * sock_desc_session)
-{
-	/*you can do anything with the data
-	we havent chosen what to do yet */
+    // listen on socket
+    if(listen(server->listener, QUEUE_SIZE) < 0) {
+        printf("[\e[31mERROR\e[00m] Unable to listen: %s\n", strerror(errno));
+        return -1;
+    }
 
-	int socket = *(int *)sock_desc_session;
-	int inc_msg;
-	char data[INC_MSSG_BUFFER]; //inc mssg buffer
+    while((sock = accept(server->listener, (struct sockaddr*)&addr, &len) > 0)) {
+        pthread_t client_thread;
+        srv_connection_ctx *client;
 
+        client = malloc(sizeof(srv_connection_ctx));
+        if(client == NULL) {
+            printf("[\e[31mERROR\e[00m] Unable to allocate memory: %s\n", strerror(errno));
+            continue;
+        }
 
-	while(inc_msg == recv(socket, data, INC_MSSG_BUFFER,0)> 0) //recieves new data
-	{
+        client->socket = sock;
+        memcpy(&client->remote, &addr, sizeof(struct sockaddr_in));
 
+        if (pthread_create(&client_thread, NULL, handler, client) < 0) {
+            printf("[\e[31mERROR\e[00m] Unable to create thread: %s\n", strerror(errno));
+            continue;
+        }
+    }
 
-		//do anything
-
-	}
-
-	if (inc_msg == 0 )
-	{
-
-		printf("error ...");
-
-
-	}
-	else if (inc_msg == -1)
-	{
-
-		printf("error ...");
-
-
-	}
-
-	free(sock_desc_session);
-	return 0;
-
+    return -1;
 }

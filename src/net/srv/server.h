@@ -1,10 +1,23 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-struct sockaddr_in srv, newconn;
-void *conneclient_handler(void *);
-void server(int port);
-int sock_desc, new_socket, *new_sock;
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+typedef struct {
+    struct sockaddr_in remote;
+    int socket;
+}srv_connection_ctx;
+
+typedef struct {
+    struct sockaddr_in local;
+    int listener;
+    pthread_t *threads;
+    size_t thread_count;
+}srv_ctx;
+
+int srv_init(srv_ctx *server, int port, int threads);
+int srv_listen(srv_ctx *server, void *(*handler)(void *));
 
 #endif
 
