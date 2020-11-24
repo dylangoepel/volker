@@ -17,16 +17,9 @@
 // TODO: outsource error handling
 // TODO : main function shuould create the thread pool
 // initialize and prepare a srv_ctx for listening
-int srv_init(srv_ctx *server, int port, int threads) {
+int srv_init(srv_ctx *server, int port) {
     // initialize thread array
-    server->thread_count = threads;
-    server->threads = malloc(sizeof(pthread_t) * threads);
-    if(server->threads == NULL) {
-        printf("[\e[31mERROR\e[00m] Unable to allocate memory.\n");
-        return -1;
-    }
-    bzero(server->threads, sizeof(pthread_t) * threads);
-
+    
     // initialize local sockaddr_in
     server->local.sin_family = AF_INET; // IPv4. TODO: add IPv6 support
     server->local.sin_addr.s_addr = htonl(INADDR_ANY); // no subnet filter (0.0.0.0)

@@ -12,11 +12,9 @@ typedef struct {
 typedef struct {
     struct sockaddr_in local;
     int listener;
-    pthread_t *threads;
-    size_t thread_count;
 }srv_ctx;
 
-int srv_init(srv_ctx *server, int port, int threads);
+int srv_init(srv_ctx *server, int port);
 int srv_listen(srv_ctx *server, void(*handler)(void *);
 
 #endif
