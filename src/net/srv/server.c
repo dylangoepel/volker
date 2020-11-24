@@ -15,7 +15,7 @@
 #define QUEUE_SIZE 10
 
 // TODO: outsource error handling
-
+// TODO : main function shuould create the thread pool
 // initialize and prepare a srv_ctx for listening
 int srv_init(srv_ctx *server, int port, int threads) {
     // initialize thread array
@@ -55,7 +55,7 @@ int srv_listen(srv_ctx *server, void(*handler)(void *)) {
     socklen_t len = sizeof(struct sockaddr_in);
     tpool_t main_pool; //pool name
 
-    tpool_init(&main_pool, 20, 40) /*init the pool and creates 20 threads*/
+    tpool_init(&main_pool, 20, 40) /*init the pool and creates 20 threads, this should to the main function*/
 
     // listen on socket
     if(listen(server->listener, QUEUE_SIZE) < 0) {
@@ -76,8 +76,8 @@ int srv_listen(srv_ctx *server, void(*handler)(void *)) {
         client->socket = sock;
         /*puts new connection to the list*/
 
-        if (tpool_add_work(main_pool, handler, handler, client) < 0) {
-            printf("[\e[31mERROR\e[00m] Unable to create thread: %s\n", strerror(errno));
+        if (tpool_add_work(main_pool, handler, client) < 0) {
+            printf("[\e[31mERROR\e[00m] Unable to add work to thread pool : %s\n", strerror(errno));
             continue;
         }
     }
