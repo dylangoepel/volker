@@ -8,7 +8,7 @@
 //needs to be changed 
 #include "server.h"
 /*needs to be corrected*/
-#include "/src/tpool/tpool.h"
+#include "tpool.h"
 
 //doesnt matter as long it is not taken
 #define INC_MSSG_BUFFER 1000
@@ -48,7 +48,7 @@ int srv_listen(srv_ctx *server, void(*handler)(void *)) {
     socklen_t len = sizeof(struct sockaddr_in);
     tpool_t main_pool; //pool name
 
-    tpool_init(&main_pool, 20, 40) /*init the pool and creates 20 threads, this should to the main function*/
+    tpool_init(&main_pool, 20, 40); /*init the pool and creates 20 threads, this should to the main function*/
 
     // listen on socket
     if(listen(server->listener, QUEUE_SIZE) < 0) {

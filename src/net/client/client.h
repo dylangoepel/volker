@@ -13,5 +13,5 @@ typedef struct {
 
 
 int client_connect(client_conn *client);
-int client_init(client_conn *client, int port);
+int client_init(client_conn *client, int addr, int port);
 #endif

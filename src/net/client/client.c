@@ -20,13 +20,13 @@ int client_connect(client_conn *client)
 }
 
 
-int client_init(client_conn *client, int port)
+int client_init(client_conn *client, int addr, int port)
 {
 	/*intit local_client sockaddr... */ 
 
 	client->local_client.sin_family = AF_INET;
 	client->local_client.sin_port = htons(port);
-	client->local_client.sin_addr.s_addr = /*give him an ip somehow via char* or struct*/
+	client->local_client.sin_addr.s_addr = addr;
 
 	if((client->socket = socket(AF_INET, SOCK_STREAM, 0)) <0)
 	{
@@ -34,7 +34,7 @@ int client_init(client_conn *client, int port)
 		return -1;
 	}
 
-	if(client_connect(&client) < 0)
+	if(client_connect(client) < 0)
 	{
 		perror("Unable to connect to server:");
 		return -2;
