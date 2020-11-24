@@ -8,7 +8,7 @@
 #include "client.h"
 
 /*TODO : give him a addr in client_init via char* or in the struct*/
-
+/*TODO : and create a handler with the tpool */
 int client_connect(client_conn *client)
 {
 
@@ -39,6 +39,8 @@ int client_init(client_conn *client, int port)
 		perror("Unable to connect to server:");
 		return -2;
 	}
+
+	/*here with tpool*/
 	return 0;
 
 }
