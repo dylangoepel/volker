@@ -7,7 +7,6 @@
 #include <errno.h>
 //needs to be changed 
 #include "server.h"
-/*needs to be corrected*/
 #include "tpool.h"
 
 //doesnt matter as long it is not taken

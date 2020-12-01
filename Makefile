@@ -1,5 +1,5 @@
 cc := clang
-coflags :=
+coflags :=  -Isrc/tpool
 cbflags := -pthread -lgmp
 
 objs := $(shell find src -iname '*.c' | sed "s,src,obj,g; s,c$$,o,g")
