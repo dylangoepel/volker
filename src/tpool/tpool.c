@@ -190,5 +190,6 @@ int tpool_destroy(tpool_t tpool, int finish)
  
   free(tpool->tpid); 
   free(tpool->queue); 
-  free(tpool); 
+  free(tpool);
+  return 0;
 } 

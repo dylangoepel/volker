@@ -56,8 +56,7 @@ int srv_listen(srv_ctx *server, void(*handler)(void *)) {
     }
 
     while((sock = accept(server->listener, (struct sockaddr*)&addr, &len) > 0)) {
-        pthread_t client_thread;
-        srv_connection_ctx *client;
+        srv_connection_ctx *client = NULL;
 
         client = malloc(sizeof(srv_connection_ctx));
         if(client == NULL) {
