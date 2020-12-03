@@ -10,7 +10,7 @@
 
 
 
-int _ssh_init(char *hstn, char *usr, ssh_session session);
+ssh_session conn_ssh(const char *hst, const char *usr, int ver);
 bool ssh_try_pwd(char *pwd, ssh_session session);
 
 #endif // SSH_H

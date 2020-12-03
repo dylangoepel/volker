@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h> 
-
+#include <errno.h>
+#include "ssh.h"
 /*
 
 TODO : scp func
@@ -34,27 +35,32 @@ ssh_try_pwd(char *pwd, ssh_session session){
 
 }
 
-int
-_ssh_init(char *hstn, char *usr, ssh_session session){
-
-  session = ssh_new();
-  if(session == NULL){
-    return -1;
+ssh_session
+conn_ssh(const char *hst, const char *usr,int ver){
+  ssh_session session;
+  session=ssh_new();
+  
+  if (session == NULL) {
+    return NULL;
   }
 
-  /* can and should be changed, now only for debugging*/
-  int verbo = SSH_LOG_PROTOCOL;
-  int c;
-  ssh_options_set(session, SSH_OPTIONS_HOST, hstn);
-  ssh_options_set(session, SSH_OPTIONS_USER, usr);
-  ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verbo);
-
-
-  if((c = ssh_connect(session)) != SSH_OK){
-    fprintf(stderr, "Error: %s\n", ssh_get_error(session));
-    ssh_free(session);
-    return -2;
+  if(usr != NULL){
+    if (ssh_options_set(session, SSH_OPTIONS_USER, usr) < 0) {
+      ssh_disconnect(session);
+      return NULL;
+    }
   }
 
-  return -4;
+  if (ssh_options_set(session, SSH_OPTIONS_HOST, hst) < 0) {
+    return NULL;
+  }
+  ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &ver);
+  
+  if(ssh_connect(session)){
+    fprintf(stderr,"Connection failed : %s\n",ssh_get_error(session));
+    ssh_disconnect(session);
+    return NULL;
+  }
+ 
+  return session;
 }
