@@ -11,8 +11,7 @@ TODO : scp func
  */
 
 
-bool
-ssh_try_pwd(char *pwd, ssh_session session){
+bool ssh_try_pwd(char *pwd, ssh_session session){
 
   int c;
 
@@ -35,8 +34,7 @@ ssh_try_pwd(char *pwd, ssh_session session){
 
 }
 
-ssh_session
-conn_ssh(const char *hst, const char *usr,int ver){
+ssh_session conn_ssh(const char *hst, const char *usr,int ver){
   ssh_session session;
   session=ssh_new();
   
