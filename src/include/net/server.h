@@ -14,7 +14,7 @@ typedef struct {
     int listener;
 }srv_ctx;
 
-int srv_init(srv_ctx *server, int port);
+int srv_init(srv_ctx *server);
 int srv_listen(srv_ctx *server, void(*handler)(void *));
 
 #endif
