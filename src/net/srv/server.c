@@ -5,15 +5,14 @@
 #include <pthread.h>
 #include <string.h>
 #include <errno.h>
-//needs to be changed 
+ 
 #include "server.h"
 #include "tpool.h"
 
-//doesnt matter as long it is not taken
 #define INC_MSSG_BUFFER 1000
 #define QUEUE_SIZE 10
 #define SRV_PORT 5632
-// TODO: outsource error handling
+// TODO: outsource error handling and make it quit
 // TODO : main function shuould create the thread pool
 // initialize and prepare a srv_ctx for listening
 int srv_init(srv_ctx *server) {
