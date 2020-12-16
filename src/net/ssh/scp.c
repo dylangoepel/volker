@@ -6,7 +6,7 @@
 
 #include "ssh.h"
 #include "ssh_local.h"
-/* Only use thr scp_write func, scp_write_file should be only local and not global and only used by scp_write*/
+/* Only use the scp_write func, scp_write_file should be only local and not global and only used by scp_write*/
 
 int scp_write(ssh_session session){
 
@@ -38,13 +38,13 @@ int scp_write(ssh_session session){
 
 int scp_write_file(ssh_session session, ssh_scp scp){
 
-  /* TODO : read binaray file and put it in a char *exe (best way with fgetc but it needs to be in a char not int)  
+  /* TODO : read binaray file and put it in a char *exe (the best way  would be with fgetc but it needs to be in a char not int)  
      and give it to the function */
 
   int rc;
   char *exe;
   int len = strlen(exe);
-  //create dir in ~/home/.conf_local
+  //create dir in ~/.conf_local
   rc = ssh_scp_push_directory(scp, ".conf_local", 0755);
   if(rc!=SSH_OK){
     fprintf(stderr, "not able to create dir: %s\n", ssh_get_error(session));
