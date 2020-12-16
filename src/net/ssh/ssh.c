@@ -4,12 +4,6 @@
 #include <stdbool.h> 
 #include <errno.h>
 #include "ssh.h"
-/*
-
-TODO : scp func
-
- */
-
 
 bool ssh_try_pwd(char *pwd, ssh_session session){
 
