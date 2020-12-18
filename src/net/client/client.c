@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <errno.h>
-#include "client/client.h"
+#include "net/client.h"
 
 /*TODO : give him a addr in client_init via char* or in the struct*/
 /*TODO : and create a handler with the tpool */

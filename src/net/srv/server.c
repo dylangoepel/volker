@@ -6,7 +6,7 @@
 #include <string.h>
 #include <errno.h>
  
-#include "net/srv/server.h"
+#include "net/server.h"
 #include "tpool/tpool.h"
 
 #define INC_MSSG_BUFFER 1000
