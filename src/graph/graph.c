@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 // exhaustive search for pointer in pointer array, returns bool
-uint8_t *__chk_ptr_in_array(void **a, uint32_t c, void *ptr) {
+uint8_t __chk_ptr_in_array(void **a, uint32_t c, void *ptr) {
     for(uint32_t i = 0; i < c; ++i) {
         if(a[i] == ptr)
             return 1;
@@ -14,7 +14,7 @@ inline int __arr_append_ptr(void **arr[], uint32_t *count, uint32_t *size, void 
     if(*size < (*count + 1) * sizeof(void *)) {
         void *newarr = realloc(*arr, *size + GR_LINEARIZE_BUFSIZE);
         if(newarr == NULL) {
-            return NULL;
+            return  -1;
         }
 
         *arr = newarr;
@@ -22,7 +22,9 @@ inline int __arr_append_ptr(void **arr[], uint32_t *count, uint32_t *size, void 
     }
 
     *arr[*count] = ptr;
-    *count++;
+    (*count)++;
+
+    return 0;
 }
 
 gr_node *gr_new(vlkr_id id, uint32_t addr) {
@@ -37,21 +39,25 @@ gr_node *gr_new(vlkr_id id, uint32_t addr) {
 
     node->neighbor = NULL;
     node->neighbor_count = 0;
+
+    return node;
 }
 
 int gr_connect(gr_node *n1, gr_node *n2) {
-    gr_node *newarray;
+    gr_node **newarray;
 
     if(n1->neighbor_count == 0)
         newarray = malloc(sizeof(gr_node));
     else
-        newarray = realloc(sizeof(gr_node) * (n1->neighbor_count + 1));
+        newarray = realloc(n1->neighbor, sizeof(gr_node) * (n1->neighbor_count + 1));
 
     if(newarray == NULL) // on allocation error
-        return NULL;
+        return -1;
 
     newarray[n1->neighbor_count] = n2;
-    ++n1->neighor_count;
+    ++(n1->neighbor_count);
+
+    n1->neighbor = newarray;
 
     return 0;
 }
@@ -66,11 +72,11 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
     }
 
     while(1) {
-        __arr_append_ptr(&buffer, &node_count, &current_bufsize, current);
+        __arr_append_ptr((void ***) &buffer, &node_count, &current_bufsize, current);
 
         uint8_t dead_end = 1;
         for(uint32_t i = 0; i < current->neighbor_count; ++i) {
-            if(!__chk_ptr_in_array(buffer, node_count, current->neighbor[i])) {
+            if(!__chk_ptr_in_array((void **) buffer, node_count, current->neighbor[i])) {
                 current = current->neighbor[i];
                 dead_end = 0;
                 break;
