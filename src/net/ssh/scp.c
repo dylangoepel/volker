@@ -4,8 +4,8 @@
 #include <errno.h>
 #include <string.h>
 
-#include "ssh.h"
-#include "ssh_local.h"
+#include "net/ssh/ssh.h"
+#include "net/ssh/ssh_local.h"
 /* Only use the scp_write func, scp_write_file should be only local and not global and only used by scp_write*/
 
 int scp_write(ssh_session session){

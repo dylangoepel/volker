@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h> 
 #include <errno.h>
-#include "ssh.h"
+#include "net/ssh/ssh.h"
 
 bool ssh_try_pwd(char *pwd, ssh_session session){
 

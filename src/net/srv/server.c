@@ -6,8 +6,8 @@
 #include <string.h>
 #include <errno.h>
  
-#include "server.h"
-#include "tpool.h"
+#include "net/srv/server.h"
+#include "tpool/tpool.h"
 
 #define INC_MSSG_BUFFER 1000
 #define QUEUE_SIZE 10
