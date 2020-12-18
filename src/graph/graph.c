@@ -5,7 +5,7 @@
 // exhaustive search for pointer in pointer array, returns bool
 uint8_t __chk_ptr_in_array(void **a, uint32_t c, void *ptr) {
     for(uint32_t i = 0; i < c; ++i) {
-        if(a[i] == ptr)
+        if(a[i * sizeof(void*)] == ptr)
             return 1;
     }
     return 0;
@@ -21,7 +21,7 @@ static inline int __arr_append_ptr(void **arr[], uint32_t *count, uint32_t *size
         *size += GR_LINEARIZE_BUFSIZE;
     }
 
-    *arr[*count] = ptr;
+    *(*arr + *count * sizeof(void*)) = ptr;
     (*count)++;
 
     return 0;
@@ -63,18 +63,20 @@ int gr_connect(gr_node *n1, gr_node *n2) {
 }
 
 gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
-    uint32_t current_bufsize = GR_LINEARIZE_BUFSIZE, node_count = 0, node_id = 0;
+    uint32_t current_bufsize = GR_LINEARIZE_BUFSIZE * sizeof(gr_node), node_count = 0, node_id = 0;
     gr_node **buffer, *current = graph;
 
-    buffer = malloc(GR_LINEARIZE_BUFSIZE * sizeof(gr_node));
+    buffer = malloc(current_bufsize);
     if(buffer == NULL) {
         return NULL;
     }
 
+    uint8_t dead_end = 0;
     while(1) {
-        __arr_append_ptr((void ***) &buffer, &node_count, &current_bufsize, current);
+        if(!dead_end)
+            __arr_append_ptr((void ***) &buffer, &node_count, &current_bufsize, current);
 
-        uint8_t dead_end = 1;
+        dead_end = 1;
         for(uint32_t i = 0; i < current->neighbor_count; ++i) {
             if(!__chk_ptr_in_array((void **) buffer, node_count, current->neighbor[i])) {
                 current = current->neighbor[i];
@@ -86,7 +88,7 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
         if(dead_end && (node_id == 0)) {
             break;
         } else if(dead_end) {
-            current = buffer[node_id - 1];
+            current = buffer[(node_id - 1) * sizeof(void*)];
             node_id--;
         } else {
             node_id = node_count;
@@ -103,8 +105,8 @@ gr_node *gr_find_by_id(gr_node *graph, vlkr_id id) {
     gr_node **nodes = gr_linearize(graph, &node_count);
 
     for(uint32_t i = 0; i < node_count; ++i) {
-        if(nodes[i]->id == id) {
-            return nodes[i];
+        if(nodes[i * sizeof(void*)]->id == id) {
+            return nodes[i * sizeof(void*)];
         }
     }
 
