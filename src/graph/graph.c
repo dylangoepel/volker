@@ -10,7 +10,7 @@ uint8_t __chk_ptr_in_array(void **a, uint32_t c, void *ptr) {
     }
     return 0;
 }
-inline int __arr_append_ptr(void **arr[], uint32_t *count, uint32_t *size, void *ptr) {
+static inline int __arr_append_ptr(void **arr[], uint32_t *count, uint32_t *size, void *ptr) {
     if(*size < (*count + 1) * sizeof(void *)) {
         void *newarr = realloc(*arr, *size + GR_LINEARIZE_BUFSIZE);
         if(newarr == NULL) {
