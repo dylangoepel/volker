@@ -9,6 +9,8 @@ objs := $(shell find src -iname '*.c' | sed "s,src,obj,g; s,c$$,o,g")
 objects: $(objs)
 all: $(objs) bin/volker
 
+testsbin := $(shell find tests -iname '*.c'  | sed "s,tests/,bin/test_,g; s,\.c$$,,g")
+
 clean:
 	rm -f $(objs) $(testbin) bin/volker
 
@@ -20,3 +22,9 @@ obj/%.o: src/%.c
 bin/volker: $(objs)
 	mkdir -p bin
 	$(cc) $(cbflags) -o $@ $^
+
+bin/test_%: tests/%.c $(objs)
+	mkdir -p bin
+	$(cc) $(coflags) $(cbflags) -o $@ $^
+
+tests: $(testsbin)
