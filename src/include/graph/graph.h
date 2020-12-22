@@ -7,6 +7,9 @@
 #define GR_LINEARIZE_BUFSIZE 1000 // increase the node buffer by 100 * sizeof(gr_node) steps in gr_linearize
 #endif
 
+#define VLKR_ID_INALID 0
+#define VLKR_ID_ROOT 1
+
 typedef uint16_t vlkr_id;
 
 struct gr_node {
