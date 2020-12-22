@@ -1,15 +1,9 @@
 #include <gmp.h>
 #include <stdlib.h>
 
-/* DIFFIE HELLMAN KEY EXCHANGE CONSTANTS (see rfc 3526) */
+#include "mem.h" // _heapvar
 
-#define _heapvar(ptr, type) \
-    type *ptr; \
-    { \
-    ptr = malloc(sizeof(type)); \
-    if(ptr == NULL) \
-        return NULL; \
-    }
+/* DIFFIE HELLMAN KEY EXCHANGE CONSTANTS (see rfc 3526) */
 
 /* returns the constant big prime number used for diffie hellman key exchange */
 mpz_t *dh_get_p() {
