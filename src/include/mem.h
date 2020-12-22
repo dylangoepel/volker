@@ -25,4 +25,20 @@
         return NULL; \
     }
 
+#define realloc_free_null(ptr, size) { \
+    void *newptr = realloc(ptr, size); \
+    if(newptr == NULL) { \
+        free(ptr); \
+        return NULL; \
+    } \
+    ptr = newptr; \
+    }
+
+#define realloc_null(ptr, size) { \
+    void *newptr = realloc(ptr, size); \
+    if(newptr == NULL) \
+        return NULL; \
+    ptr = newptr; \
+    }
+
 #endif
