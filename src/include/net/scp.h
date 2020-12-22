@@ -4,6 +4,6 @@
 #include <libssh/libssh.h>
 
 
-int scp_write(ssh_session session);
+int scp_write(ssh_session *session);
 
 #endif // SCP_H
