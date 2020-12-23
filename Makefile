@@ -28,3 +28,6 @@ bin/test_%: tests/%.c $(objs)
 	$(cc) $(coflags) $(cbflags) -o $@ $^
 
 tests: $(testsbin)
+
+test: tests
+	for test in bin/test*; do echo -e "\033[32m[+]" running $$test "\033[00m"; $$test || echo -e "\033[31m[-] returned error: $$? \033[00m"; done
