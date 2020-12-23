@@ -36,8 +36,8 @@
 
 #define ensure_space(ptr, size, used, additional) { \
     if(*size - used >= additional) { \
-        realloc_free_null(ptr, *size + MEM_ALLOC_BLOCK); \
+        realloc_or_fail(ptr, *size + MEM_ALLOC_BLOCK); \
         *size += MEM_ALLOC_BLOCK; \
-    }
+    } }
 
 #endif
