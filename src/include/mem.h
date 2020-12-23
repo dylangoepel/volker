@@ -4,6 +4,7 @@
 #define MEM_H_
 
 #include <stdlib.h>
+#include "fail.h"
 
 #ifndef MEM_ALLOC_BLOCK
 #define MEM_ALLOC_BLOCK 1024
@@ -25,20 +26,18 @@
         return NULL; \
     }
 
-#define realloc_free_null(ptr, size) { \
-    void *newptr = realloc(ptr, size); \
+#define realloc_or_fail(ptr, size) { \
+    void *newptr = realloc(*ptr, size); \
     if(newptr == NULL) { \
-        free(ptr); \
-        return NULL; \
+        fail_free(ptr); \
     } \
-    ptr = newptr; \
+    *ptr = newptr; \
     }
 
-#define realloc_null(ptr, size) { \
-    void *newptr = realloc(ptr, size); \
-    if(newptr == NULL) \
-        return NULL; \
-    ptr = newptr; \
+#define ensure_space(ptr, size, used, additional) { \
+    if(*size - used >= additional) { \
+        realloc_free_null(ptr, *size + MEM_ALLOC_BLOCK); \
+        *size += MEM_ALLOC_BLOCK; \
     }
 
 #endif
