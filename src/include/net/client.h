@@ -12,6 +12,6 @@ typedef struct {
 }client_conn;
 
 
-int client_connect(client_conn *client);
-int client_init(client_conn *client, int addr, int port);
+int __client_connect(client_conn *client);
+int client_init(client_conn *client, int addr, unsigned int port);
 #endif

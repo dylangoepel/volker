@@ -3,6 +3,6 @@
 
 #include <libssh/libssh.h>
 
-int scp_write_file(ssh_session, ssh_scp scp);
+int  __write_file(ssh_session *session, ssh_scp *scp);
 
 #endif //SSH_LOCAL_H
