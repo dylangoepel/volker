@@ -4,7 +4,7 @@
 #include "graph/graph.h"
 
 #define ATOMID_INVALID 0
-typedef uint16_t atomid;
+typedef uint32_t atomid;
 
 #define ATYPE_EOF  0
 #define ATYPE_NODE 1
@@ -29,6 +29,6 @@ struct gr_list_atom {
     atomid tail;
 };
 
-char *gr_serialize(gr_node *graph);
+char *gr_serialize(gr_node *graph, uint32_t *size);
 
 #endif
