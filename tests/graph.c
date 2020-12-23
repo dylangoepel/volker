@@ -32,10 +32,10 @@ int main() {
 
     uint32_t idsum = 0;
     for(int i = 0; i < 6; ++i) {
-        idsum += (*(nodes + i * sizeof(void*)))->id;
+        idsum += (*(linear + i * sizeof(void*)))->id;
     }
     free(linear);
-    if(idsum != 21) {
+    if(idsum != 15) {
         return EXIT_LINEARIZE_SUM_ERROR;
     }
 
