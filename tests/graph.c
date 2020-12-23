@@ -24,18 +24,18 @@ int main() {
     /* test gr_linearize */
     uint32_t size;
     gr_node **linear = gr_linearize(nodes[0], &size);
-    if(size != 5) {
+    if(size != 6) {
         if(linear != NULL)
             free(linear);
         return EXIT_LINEARIZE_SIZE_ERROR;
     }
 
     uint32_t idsum = 0;
-    for(int i = 0; i < 5; ++i) {
+    for(int i = 0; i < 6; ++i) {
         idsum += (*(nodes + i * sizeof(void*)))->id;
     }
     free(linear);
-    if(idsum != 15) {
+    if(idsum != 21) {
         return EXIT_LINEARIZE_SUM_ERROR;
     }
 
