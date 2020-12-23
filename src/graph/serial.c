@@ -4,7 +4,12 @@
 #include "graph/graph.h"
 #include "graph/serial.h"
 
-/* internal macro for gr_serialize_linear */
+/* internal macros for gr_serialize_linear */
+#define _gr_push_atom_type(buffer, buffer_size, used_size, atomtype) { \
+        ensure_space(&buffer, &buffer_size, used_size, sizeof(atom_type)); \
+        memcpy(buffer + used_space, &atom_type, sizeof(atom_type)); \
+        used_size += sizeof(atom_type); \
+    }
 #define _gr_spush_atom(buffer, buffer_size, used_size, atom, atomtype, current_id) { \
         ensure_space(&buffer, &buffer_size, used_size, sizeof(atomtype)); \
         memcpy(buffer + used_space, &atom, sizeof(atomtype)); \
@@ -34,6 +39,7 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
             current_node_atom.neighbors = ATOMID_INVALID;
         }
 
+        _gr_push_atom_type(buffer, buffer_size, used_space, ATYPE_NODE);
         _gr_push_atom(buffer, buffer_size, used_space, current_node_atom, struct gr_node_atom, current_id);
 
         /* write neighbors */
@@ -43,6 +49,7 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
             current_neighbor_atom.current = *(current_node->neighbors + sizeof(void*) * ni)->id;
             current_neighbor_atom.tail = current_id + 1;
 
+            _gr_push_atom_type(buffer, buffer_size, used_space, ATYPE_LIST);
             _gr_push_atom(buffer, buffer_size, used_space, current_neighbor_atom, struct gr_list_atom, current_id);
         }
     }
