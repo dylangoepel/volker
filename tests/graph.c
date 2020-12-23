@@ -21,6 +21,13 @@ int main() {
         gr_connect(nodes[i > 0 ? i - 1 : 4], nodes[i]);
     }
 
+    /*test gr_dconnect, it works ;)*/
+
+    gr_dconnect(nodes[2], nodes[3]);
+
+    /*just be careful if you dconnect two nodes and than later find_by_id the dconnected one*/ 
+    
+      
     /* test gr_linearize */
     uint32_t size;
     gr_node **linear = gr_linearize(nodes[0], &size);

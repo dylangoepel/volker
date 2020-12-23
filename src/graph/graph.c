@@ -80,8 +80,7 @@ int gr_dconnect(gr_node *n1, gr_node *n2) {
   }
 
    --(n1->neighbor_count);
-   tmparray = realloc(n1->neighbor, sizeof(gr_node) * (n1->neighbor_count -1));
-   
+   tmparray = realloc(n1->neighbor, sizeof(gr_node) * (n1->neighbor_count -1)); // -1 is right! bc tmparray[tm +1]y
    n1->neighbor = tmparray;
 
    return 0;
