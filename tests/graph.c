@@ -5,7 +5,8 @@
 
 #define EXIT_FIND_ERROR 1
 #define EXIT_SERIALIZE_ERROR 2
-#define EXIT_LINEARIZE_ERROR 3
+#define EXIT_LINEARIZE_SIZE_ERROR 3
+#define EXIT_LINEARIZE_SUM_ERROR 4
 
 int main() {
     gr_node *nodes[6];
@@ -26,7 +27,7 @@ int main() {
     if(size != 5) {
         if(linear != NULL)
             free(linear);
-        return EXIT_LINEARIZE_ERROR;
+        return EXIT_LINEARIZE_SIZE_ERROR;
     }
 
     uint32_t idsum = 0;
@@ -35,7 +36,7 @@ int main() {
     }
     free(linear);
     if(idsum != 15) {
-        return EXIT_LINEARIZE_ERROR;
+        return EXIT_LINEARIZE_SUM_ERROR;
     }
 
     /* test search functionality */
