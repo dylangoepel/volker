@@ -5,6 +5,7 @@
 
 #define EXIT_FIND_ERROR 1
 #define EXIT_SERIALIZE_ERROR 2
+#define EXIT_LINEARIZE_ERROR 3
 
 int main() {
     gr_node *nodes[6];
@@ -19,6 +20,24 @@ int main() {
         gr_connect(nodes[i > 0 ? i - 1 : 4], nodes[i]);
     }
 
+    /* test gr_linearize */
+    uint32_t size;
+    gr_node **linear = gr_linearize(nodes[0], &size);
+    if(size != 5) {
+        if(linear != NULL)
+            free(linear);
+        return EXIT_LINEARIZE_ERROR;
+    }
+
+    uint32_t idsum = 0;
+    for(int i = 0; i < 5; ++i) {
+        idsum += (*(nodes + i * sizeof(void*)))->id;
+    }
+    free(linear);
+    if(idsum != 15) {
+        return EXIT_LINEARIZE_ERROR;
+    }
+
     /* test search functionality */
 
     gr_node *result = gr_find_by_id(nodes[0], 5);
@@ -30,5 +49,7 @@ int main() {
     uint32_t buffer_size = 0;
     char *buffer = gr_serialize(nodes[0], &buffer_size); 
     if(buffer == NULL)
-        return EXIT_FIND_ERROR;
+        return EXIT_SERIALIZE_ERROR;
+
+    return 0;
 }
