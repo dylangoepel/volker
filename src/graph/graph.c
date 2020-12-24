@@ -55,7 +55,7 @@ int gr_connect(gr_node *n1, gr_node *n2) {
     if(newarray == NULL) // on allocation error
         return -1;
 
-    newarray[n1->neighbor_count] = n2;
+    newarray[n1->neighbor_count * sizeof(void*)] = n2;
     ++(n1->neighbor_count);
 
     n1->neighbor = newarray;
@@ -75,6 +75,7 @@ int gr_dconnect(gr_node *n1, gr_node *n2) {
       }
     }
 
+    n1->neighbor_count -= entries_removed;
     if((n1->neighbor = realloc(n1->neighbor, (n1->neighbor_count - entries_removed) * sizeof(void *))) == NULL)
         return -1;
 
