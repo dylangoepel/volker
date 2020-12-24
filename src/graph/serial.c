@@ -5,18 +5,11 @@
 #include "graph/graph.h"
 #include "graph/serial.h"
 
-/* internal macros for gr_serialize_linear */
-#define _gr_push_atom_type(buffer, buffer_size, used_size, atomtype) { \
-        ensure_space(&buffer, &buffer_size, used_size, sizeof(atom_type)); \
-        memcpy(buffer + used_size, atomtype, sizeof(atom_type)); \
-        used_size += sizeof(atom_type); \
-    }
-#define _gr_push_atom(buffer, buffer_size, used_size, atom, atomtype, current_id) { \
-        ensure_space(&buffer, &buffer_size, used_size, sizeof(atomtype)); \
-        memcpy(buffer + used_size, &atom, sizeof(atomtype)); \
-        used_size += sizeof(atomtype); \
-        current_id += 1; \
-    }
+static inline char *__push_onto_buffer(char **buffer, uint32_t *buffer_size, uint32_t *used_size, char *data, uint32_t data_size) {
+    ensure_space(buffer, buffer_size, *used_size, data_size);
+    memcpy(*buffer + *used_size, data, data_size);
+    *used_size += data_size;
+}
 
 char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
     char *buffer;
@@ -28,7 +21,7 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
 
     // write all nodes
     for(int i = 0; i < count; ++i) {
-        gr_node *current_node = *(nodes + sizeof(void*) * i);
+        gr_node *current_node = *(nodes + i);
         struct gr_node_atom current_node_atom;
 
         current_node_atom.id = current_node->id;
@@ -42,8 +35,8 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
         }
 
         atype = ATYPE_NODE;
-        _gr_push_atom_type(buffer, buffer_size, used_size, &atype);
-        _gr_push_atom(buffer, buffer_size, used_size, current_node_atom, struct gr_node_atom, current_id);
+        __push_onto_buffer(&buffer, &buffer_size, &used_size, &atype, sizeof(atype));
+        __push_onto_buffer(&buffer, &buffer_size, &used_size, &current_node_atom, sizeof(current_node_atom));
 
         /* write neighbors */
         for(int ni = 0; ni < current_node->neighbor_count; ++ni) {
@@ -53,8 +46,8 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
             current_neighbor_atom.tail = current_id + 1;
 
             atype = ATYPE_LIST;
-            _gr_push_atom_type(buffer, buffer_size, used_size, &atype);
-            _gr_push_atom(buffer, buffer_size, used_size, current_neighbor_atom, struct gr_list_atom, current_id);
+            __push_onto_buffer(&buffer, &buffer_size, &used_size, &atype, sizeof(atype));
+            __push_onto_buffer(&buffer, &buffer_size, &used_size, &current_neighbor_atom, sizeof(current_neighbor_atom));
         }
     }
 
