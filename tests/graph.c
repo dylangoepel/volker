@@ -7,6 +7,8 @@
 #define EXIT_SERIALIZE_ERROR 2
 #define EXIT_LINEARIZE_SIZE_ERROR 3
 #define EXIT_LINEARIZE_SUM_ERROR 4
+#define EXIT_DCONNECT_ERROR 5
+
 
 int main() {
     gr_node *nodes[6];
@@ -20,26 +22,7 @@ int main() {
     for(int i = 0; i < 6; ++i) {
         gr_connect(nodes[i > 0 ? i - 1 : 4], nodes[i]);
     }
-
-    /*test gr_dconnect, its not working ignore it   
-    
-    gr_node *temp1 = gr_new(7, 1);
-    gr_node *temp2 = gr_new(8, 2);
-    gr_node *temp3 = gr_new(9, 3);
-
-    gr_connect(temp1, temp2);
-    gr_connect(temp1, temp3);
-
-    gr_node *res = gr_find_by_id(temp1, 8);
-    if(res->id != 8)
-      return EXIT_FIND_ERROR;
-    
-    gr_dconnect(temp1, temp3);
   
-    
-    just be careful if you dconnect two nodes and than later find_by_id the dconnected one*/ 
-    
-      
     /* test gr_linearize */
     uint32_t size;
     gr_node **linear = gr_linearize(nodes[0], &size);
@@ -63,6 +46,12 @@ int main() {
     gr_node *result = gr_find_by_id(nodes[1], 2);
     if(result->id != 2)
         return EXIT_FIND_ERROR;
+
+    /* test gr_dconnect */
+    gr_dconnect(nodes[4], nodes[5]);
+    result = gr_find_by_id(nodes[4], 5);
+    if(result != NULL)
+        return EXIT_DCONNECT_ERROR;
     
     /* test serialization */
 
