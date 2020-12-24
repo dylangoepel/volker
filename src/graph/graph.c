@@ -4,14 +4,14 @@
 #include <string.h> // memmove
 
 // exhaustive search for pointer in pointer array, returns bool
-uint8_t __chk_ptr_in_array(void **a, uint32_t c, void *ptr) {
+uint8_t __chk_ptr_in_array(void *a[], uint32_t c, void *ptr) {
     for(uint32_t i = 0; i < c; ++i) {
-        if(a[i * sizeof(void*)] == ptr)
+        if(a[i] == ptr)
             return 1;
     }
     return 0;
 }
-static inline int __arr_append_ptr(void **arr[], uint32_t *count, uint32_t *size, void *ptr) {
+static inline int __arr_append_ptr(void *(*arr[]), uint32_t *count, uint32_t *size, void *ptr) {
     if(*size < (*count + 1) * sizeof(void *)) {
         void *newarr = realloc(*arr, *size + GR_LINEARIZE_BUFSIZE);
         if(newarr == NULL) {
@@ -22,7 +22,7 @@ static inline int __arr_append_ptr(void **arr[], uint32_t *count, uint32_t *size
         *size += GR_LINEARIZE_BUFSIZE;
     }
 
-    *(*arr + *count * sizeof(void*)) = ptr;
+    (*arr)[*count] = ptr;
     (*count)++;
 
     return 0;
@@ -55,7 +55,7 @@ int gr_connect(gr_node *n1, gr_node *n2) {
     if(newarray == NULL) // on allocation error
         return -1;
 
-    newarray[n1->neighbor_count * sizeof(void*)] = n2;
+    newarray[n1->neighbor_count] = n2;
     ++(n1->neighbor_count);
 
     n1->neighbor = newarray;
@@ -67,16 +67,16 @@ int gr_connect(gr_node *n1, gr_node *n2) {
 int gr_dconnect(gr_node *n1, gr_node *n2) {
     uint32_t entries_removed = 0;
     for(uint32_t i = 0; i < n1->neighbor_count; ++i) {
-      if(n1->neighbor[i * sizeof(void*)] == n2) {
-          memmove(n1->neighbor + i * sizeof(void*),
-                  n1->neighbor + (i + 1) * sizeof(void*),
+      if(n1->neighbor[i] == n2) {
+          memmove(n1->neighbor + i,
+                  n1->neighbor + i + 1,
                   (n1->neighbor_count - i - 1) * sizeof(void*));
           entries_removed++;
       }
     }
 
     n1->neighbor_count -= entries_removed;
-    if((n1->neighbor = realloc(n1->neighbor, (n1->neighbor_count - entries_removed) * sizeof(void *))) == NULL)
+    if((n1->neighbor = realloc(n1->neighbor, n1->neighbor_count * sizeof(void *))) == NULL)
         return -1;
 
     return 0;
@@ -108,7 +108,7 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
         if(dead_end && (node_id == 0)) {
             break;
         } else if(dead_end) {
-            current = buffer[(node_id - 1) * sizeof(void*)];
+            current = buffer[node_id - 1];
             node_id--;
         } else {
             node_id = node_count;
@@ -125,8 +125,8 @@ gr_node *gr_find_by_id(gr_node *graph, vlkr_id id) {
     gr_node **nodes = gr_linearize(graph, &node_count);
 
     for(uint32_t i = 0; i < node_count; ++i) {
-        if(nodes[i * sizeof(void*)]->id == id) {
-            gr_node *ret = nodes[i * sizeof(void*)];
+        if(nodes[i]->id == id) {
+            gr_node *ret = nodes[i];
             free(nodes);
             return ret;
         }

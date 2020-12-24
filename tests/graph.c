@@ -34,7 +34,7 @@ int main() {
 
     uint32_t idsum = 0;
     for(int i = 0; i < 6; ++i) {
-        idsum += (*(linear + i * sizeof(void*)))->id;
+        idsum += linear[i]->id;
     }
     free(linear);
     if(idsum != 15) {
@@ -43,8 +43,8 @@ int main() {
 
     /* test search functionality */ 
 
-    gr_node *result = gr_find_by_id(nodes[1], 2);
-    if(result->id != 2)
+    gr_node *result = gr_find_by_id(nodes[0], 5);
+    if(result->id != 5)
         return EXIT_FIND_ERROR;
 
     /* test gr_dconnect */
