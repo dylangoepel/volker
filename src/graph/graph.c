@@ -62,6 +62,7 @@ int gr_connect(gr_node *n1, gr_node *n2) {
     return 0;
 }
 
+//its broke i fix it tomorrow
 int gr_dconnect(gr_node *n1, gr_node *n2) {
   gr_node **tmparray;
   n1->neighbor = tmparray;
