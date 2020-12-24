@@ -64,29 +64,20 @@ int gr_connect(gr_node *n1, gr_node *n2) {
 
 //its broke i fix it tomorrow
 int gr_dconnect(gr_node *n1, gr_node *n2) {
-  gr_node **tmparray;
-  n1->neighbor = tmparray;
-
-  if(n1->neighbor_count == 0)
-    return -1;
-  
-  else {
-   for(uint32_t l = 0; l < n1->neighbor_count; ++l) {
-     if(n2 == tmparray[l]) {
-       free(tmparray[l]);
-          for(uint32_t tm = l; tm < n1->neighbor_count; ++tm) {
-	    tmparray[tm] = tmparray[tm +1];
+    uint32_t entries_removed = 0;
+    for(uint32_t i = 0; i < n1->neighbor_count; ++i) {
+      if(n1->neighbor[i * sizeof(void*)] == n2) {
+          memmove(n1->neighbor + i * sizeof(void*),
+                  n1->neighbor + (i + 1) * sizeof(void*),
+                  (n1->neighbor_count - i - 1) * sizeof(void*));
+          entries_removed++;
       }
     }
-  }
 
-   --(n1->neighbor_count);
-   tmparray = realloc(n1->neighbor, sizeof(gr_node) * (n1->neighbor_count -1)); // -1 is right! bc tmparray[tm +1]y
-   n1->neighbor = tmparray;
+    if((n1->neighbor = realloc(n1->neighbor, (n1->neighbor_count - entries_removed) * sizeof(void *))) == NULL)
+        return -1;
 
-   return 0;
-  }
-     
+    return 0;
 }
 
 gr_node **gr_linearize(gr_node *graph, uint32_t *count) {

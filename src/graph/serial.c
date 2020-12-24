@@ -21,7 +21,7 @@
 char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
     char *buffer;
     uint32_t buffer_size = MEM_ALLOC_BLOCK, used_size = 0;
-    atomid current_id;
+    atomid current_id = 0;
     atom_type atype;
 
     alloc_null(buffer, buffer_size);
