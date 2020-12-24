@@ -27,6 +27,7 @@ typedef struct gr_node gr_node;
 // basic graph manipulation
 gr_node *gr_new(vlkr_id id, uint32_t addr);
 int gr_connect(gr_node *n1, gr_node *n2);
+int gr_dconnect(gr_node *n1, gr_node *n2);
 
 gr_node **gr_linearize(gr_node *graph, uint32_t *count);
 

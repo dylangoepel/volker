@@ -62,6 +62,33 @@ int gr_connect(gr_node *n1, gr_node *n2) {
     return 0;
 }
 
+//its broke i fix it tomorrow
+int gr_dconnect(gr_node *n1, gr_node *n2) {
+  gr_node **tmparray;
+  n1->neighbor = tmparray;
+
+  if(n1->neighbor_count == 0)
+    return -1;
+  
+  else {
+   for(uint32_t l = 0; l < n1->neighbor_count; ++l) {
+     if(n2 == tmparray[l]) {
+       free(tmparray[l]);
+          for(uint32_t tm = l; tm < n1->neighbor_count; ++tm) {
+	    tmparray[tm] = tmparray[tm +1];
+      }
+    }
+  }
+
+   --(n1->neighbor_count);
+   tmparray = realloc(n1->neighbor, sizeof(gr_node) * (n1->neighbor_count -1)); // -1 is right! bc tmparray[tm +1]y
+   n1->neighbor = tmparray;
+
+   return 0;
+  }
+     
+}
+
 gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
     uint32_t current_bufsize = GR_LINEARIZE_BUFSIZE * sizeof(gr_node), node_count = 0, node_id = 0;
     gr_node **buffer, *current = graph;

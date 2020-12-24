@@ -2,7 +2,7 @@
 #include "graph/serial.h"
 
 #include <stdlib.h>
-
+#include <stdio.h>
 #define EXIT_FIND_ERROR 1
 #define EXIT_SERIALIZE_ERROR 2
 #define EXIT_LINEARIZE_SIZE_ERROR 3
@@ -21,6 +21,25 @@ int main() {
         gr_connect(nodes[i > 0 ? i - 1 : 4], nodes[i]);
     }
 
+    /*test gr_dconnect, its not working ignore it   
+    
+    gr_node *temp1 = gr_new(7, 1);
+    gr_node *temp2 = gr_new(8, 2);
+    gr_node *temp3 = gr_new(9, 3);
+
+    gr_connect(temp1, temp2);
+    gr_connect(temp1, temp3);
+
+    gr_node *res = gr_find_by_id(temp1, 8);
+    if(res->id != 8)
+      return EXIT_FIND_ERROR;
+    
+    gr_dconnect(temp1, temp3);
+  
+    
+    just be careful if you dconnect two nodes and than later find_by_id the dconnected one*/ 
+    
+      
     /* test gr_linearize */
     uint32_t size;
     gr_node **linear = gr_linearize(nodes[0], &size);
@@ -39,10 +58,10 @@ int main() {
         return EXIT_LINEARIZE_SUM_ERROR;
     }
 
-    /* test search functionality */
+    /* test search functionality */ 
 
-    gr_node *result = gr_find_by_id(nodes[0], 5);
-    if(result->id != 5)
+    gr_node *result = gr_find_by_id(nodes[1], 2);
+    if(result->id != 2)
         return EXIT_FIND_ERROR;
     
     /* test serialization */
@@ -53,4 +72,5 @@ int main() {
         return EXIT_SERIALIZE_ERROR;
 
     return 0;
+    
 }
