@@ -47,9 +47,9 @@ int gr_connect(gr_node *n1, gr_node *n2) {
     gr_node **newarray;
 
     if(n1->neighbor_count == 0)
-        newarray = malloc(sizeof(gr_node));
+        newarray = malloc(sizeof(gr_node*));
     else
-        newarray = realloc(n1->neighbor, sizeof(gr_node) * (n1->neighbor_count + 1));
+        newarray = realloc(n1->neighbor, sizeof(gr_node*) * (n1->neighbor_count + 1));
 
     if(newarray == NULL) // on allocation error
         return -1;
@@ -95,7 +95,7 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
         }
     }
 
-    buffer = realloc(buffer, node_count * sizeof(gr_node));
+    buffer = realloc(buffer, node_count * sizeof(void*));
     *count = node_count;
     return buffer;
 }
@@ -106,7 +106,9 @@ gr_node *gr_find_by_id(gr_node *graph, vlkr_id id) {
 
     for(uint32_t i = 0; i < node_count; ++i) {
         if(nodes[i * sizeof(void*)]->id == id) {
-            return nodes[i * sizeof(void*)];
+            gr_node *ret = nodes[i * sizeof(void*)];
+            free(nodes);
+            return ret;
         }
     }
 
