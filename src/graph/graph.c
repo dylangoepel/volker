@@ -1,6 +1,7 @@
 #include "graph/graph.h"
 
 #include <stdlib.h>
+#include <string.h> // memmove
 
 // exhaustive search for pointer in pointer array, returns bool
 uint8_t __chk_ptr_in_array(void **a, uint32_t c, void *ptr) {
