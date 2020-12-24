@@ -37,7 +37,7 @@ int main() {
     gr_dconnect(temp1, temp3);
   
     
-    /*just be careful if you dconnect two nodes and than later find_by_id the dconnected one*/ 
+    just be careful if you dconnect two nodes and than later find_by_id the dconnected one*/ 
     
       
     /* test gr_linearize */
@@ -72,5 +72,5 @@ int main() {
         return EXIT_SERIALIZE_ERROR;
 
     return 0;
-    */
+    
 }
