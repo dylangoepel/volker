@@ -35,8 +35,8 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
         }
 
         atype = ATYPE_NODE;
-        __push_onto_buffer(&buffer, &buffer_size, &used_size, &atype, sizeof(atype));
-        __push_onto_buffer(&buffer, &buffer_size, &used_size, &current_node_atom, sizeof(current_node_atom));
+        __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&atype), sizeof(atype));
+        __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&current_node_atom), sizeof(current_node_atom));
 
         /* write neighbors */
         for(int ni = 0; ni < current_node->neighbor_count; ++ni) {
@@ -46,8 +46,8 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
             current_neighbor_atom.tail = current_id + 1;
 
             atype = ATYPE_LIST;
-            __push_onto_buffer(&buffer, &buffer_size, &used_size, &atype, sizeof(atype));
-            __push_onto_buffer(&buffer, &buffer_size, &used_size, &current_neighbor_atom, sizeof(current_neighbor_atom));
+            __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&atype), sizeof(atype));
+            __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&current_neighbor_atom), sizeof(current_neighbor_atom));
         }
     }
 
