@@ -39,4 +39,4 @@ test: tests
 	for test in bin/test*; do echo -e "\033[32m[+]" running $$test "\033[00m"; $$test || echo -e "\033[31m[-] returned error: $$? \033[00m"; done
 
 benchmark: benchmarks
-	for bmark in bin/bm*; do echo -e "\033[32m[+]" running $$bmark "\033[00m"; $$bm || echo -e "\033[31m[-] returned error: $$? \033[00m"; done
+	for bmark in bin/bm*; do $$bmark; done
