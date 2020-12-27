@@ -10,7 +10,7 @@ objects: $(objs)
 all: $(objs) bin/volker
 
 testsbin := $(shell find tests -iname '*.c'  | sed "s,tests/,bin/test_,g; s,\.c$$,,g")
-benchbin := $(shell find benchmarks -iname '*.c'  | sed "s,benchmarks/,bin/bm_,g; s,\.c$$,,g")
+benchbin := $(shell find benchmarks -iname '*.c' | sed "s,benchmarks/,bin/bm_,g; s,\.c$$,,g")
 
 clean:
 	rm -f $(objs) $(testbin) bin/volker
@@ -35,8 +35,10 @@ bin/bm_%: benchmarks/%.c $(objs)
 tests: $(testsbin)
 benchmarks: $(benchbin)
 
+bm: $(benchmarks)
+	mkdir -p dat
+	for bm in bin/bm_*; do $$bm; done > dat/bm.dat
+	python3 dat/bm.py
+
 test: tests
 	for test in bin/test*; do echo -e "\033[32m[+]" running $$test "\033[00m"; $$test || echo -e "\033[31m[-] returned error: $$? \033[00m"; done
-
-benchmark: benchmarks
-	for bmark in bin/bm*; do $$bmark; done
