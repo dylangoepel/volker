@@ -35,8 +35,8 @@ bin/bm_%: benchmarks/%.c $(objs)
 tests: $(testsbin)
 benchmarks: $(benchbin)
 
-bm: $(benchmarks)
-	mkdir -p dat
+bm: benchmarks
+	if [ -f dat/bm.dat ]; then mv dat/bm.dat dat/bm.old.dat; fi
 	for bm in bin/bm_*; do $$bm; done > dat/bm.dat
 	python3 dat/bm.py
 
