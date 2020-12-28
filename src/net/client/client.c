@@ -9,7 +9,7 @@
 
 /*TODO : give him a addr in client_init via char* or in the struct*/
 /*TODO : and create a handler with the tpool */
-int __client_connect(client_conn *client)
+int __client_connect(client_conn_ctx *client)
 {
 	if(connect(client->socket,(struct sockaddr*)&(client->local_client),sizeof(struct sockaddr_in)) < 0) {
         perror("Unable to connect to socket:"); 
@@ -19,13 +19,14 @@ int __client_connect(client_conn *client)
 }
 
 
-int client_init(client_conn *client, int addr, unsigned int port)
+int client_conn(client_conn_ctx *client, char* addr, unsigned int port)
 {
-	/*intit local_client sockaddr... */ 
+  /*intit local_client sockaddr... */ 
 
+    
 	client->local_client.sin_family = AF_INET;
 	client->local_client.sin_port = htons(port);
-	client->local_client.sin_addr.s_addr = addr;
+	client->local_client.sin_addr.s_addr = inet_addr(addr);
 
 	if((client->socket = socket(AF_INET, SOCK_STREAM, 0)) <0)
 	{

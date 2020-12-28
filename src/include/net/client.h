@@ -9,9 +9,9 @@ typedef struct {
 	int socket;
 	/*how should we tell which ip/addr to use */
 	struct in_addr * addr;
-}client_conn;
+}client_conn_ctx;
 
 
-int __client_connect(client_conn *client);
-int client_init(client_conn *client, int addr, unsigned int port);
+int __client_connect(client_conn_ctx *client);
+int client_conn(client_conn_ctx *client, char * addr, unsigned int port);
 #endif
