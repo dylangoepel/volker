@@ -23,7 +23,7 @@ if os.path.isfile("dat/bm.old.dat"):
 di = readDat("dat/bm.dat")
 
 for i, key in enumerate(di.keys()):
-    if diOld is not None:
+    if diOld is not None and key in diOld:
         plt.bar(i, diOld[key], color="red", width=0.25)
         plt.bar(i + 0.25, di[key], color="green", width=0.25)
     else:
