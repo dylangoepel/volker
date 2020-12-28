@@ -57,7 +57,7 @@ int srv_listen(srv_ctx *server, void(*handler)(void *)) {
     while((sock = accept(server->listener, (struct sockaddr*)&addr, &len) > 0)) {
         srv_connection_ctx *client = NULL;
 
-        client = malloc(sizeof(srv_connection_ctx));
+        client = malloc(sizeof(srv_connection_ctx *));
         if(client == NULL) {
             printf("[\e[31mERROR\e[00m] Unable to allocate memory: %s\n", strerror(errno));
             continue;
@@ -66,11 +66,11 @@ int srv_listen(srv_ctx *server, void(*handler)(void *)) {
         client->socket = sock;
         /*puts new connection to the list*/
 
-        if (tpool_add_work(main_pool, handler, client) < 0) {
+        if (tpool_add_work(main_pool, handler, (void *)client) < 0) {
             printf("[\e[31mERROR\e[00m] Unable to add work to thread pool : %s\n", strerror(errno));
             continue;
         }
     }
-
+    tpool_destroy(main_pool, 1);
     return -1;
 }
