@@ -5,7 +5,7 @@
 #include "tpool/tpool.h"
 #include "benchmark.h"
 
-#define NUM_THREADS 20
+#define NUM_THREADS 50
 #define MAX_QUEUE 40
 
 void aufg(void *arg){
@@ -31,7 +31,7 @@ int main(){
   bm_write(&ben, "tpool_add_work(20)");
 
   bm_start(&ben);
-  tpool_destroy(test, 1);
+  tpool_destroy(test, 0);
   bm_end(&ben);
   bm_write(&ben, "tpool_destroy");
 }
