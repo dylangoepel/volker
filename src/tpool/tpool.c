@@ -12,7 +12,7 @@ void *tpool_thread(void *);
 void tpool_init(tpool_t *tpoolp, size_t num, size_t max_queue_size) 
 { 
   int i; 
-  tpool_t pool; 
+  tpool_t pool;
   
  
 

@@ -1,5 +1,8 @@
 #ifndef TPOOL_H
 #define TPOOL_H
+
+#include <pthread.h>
+
 typedef struct tpool_work { 
   void        (*routine)(void *); 
   void        *arg; 
