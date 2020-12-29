@@ -22,7 +22,7 @@ int snd_msg(client_conn_ctx * arg){
     return 1;
 }
 
-void rcv_msg(void *arg){
+void *rcv_msg(void *arg){
   int res;
   char rec_msg[MSG_LENGHT];
   char lop[MSG_LENGHT] = "Test Nachricht";
@@ -46,10 +46,12 @@ void rcv_msg(void *arg){
       break;
       
   }
+
+  return NULL;
 }
 
 
-void server(){
+void *server(){
   srv_ctx main;
   
   if(srv_init(&main) < 0)
@@ -57,6 +59,8 @@ void server(){
 
   if(srv_listen(&main, &rcv_msg) < 0)
     printf("%s","Error srv_listen");     
+
+  return NULL;
 }
 
 void client(){
@@ -92,6 +96,5 @@ int main(){
   bm_end(&ben);
   bm_write(&ben, "init client and send test msg");
 
-  tpool_destroy(&haupt, 1);
-
+  tpool_destroy(&haupt, 0);
 }
