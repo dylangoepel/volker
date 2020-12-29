@@ -24,6 +24,8 @@ static inline int _tpool_queue_len(tpool_queue *q) {
 static inline tpool_queue *_tpool_queue_last(tpool_queue *q) {
     tpool_queue *c;
 
+    if(q == NULL)
+        return NULL;
     for(c = q; c->tail != NULL; c = c->tail) {}
 
     return c;
@@ -52,7 +54,7 @@ int tpool_init(tpool_t *pool, int thread_count, int queue_size) {
 
 int tpool_add_work(tpool_t *pool, void *(*routine)(void *), void *arg) {
     // TODO: proper error handling
-    tpool_queue *new;
+    tpool_queue *new, *last;
     pthread_mutex_lock(&pool->lock);
 
     if(_tpool_queue_len(pool->queue) >= pool->max_queue_size)
@@ -63,7 +65,11 @@ int tpool_add_work(tpool_t *pool, void *(*routine)(void *), void *arg) {
         return -1;
 
     // connect new element to queue
-    _tpool_queue_last(pool->queue)->tail = new;
+    last = _tpool_queue_last(pool->queue);
+    if(last == NULL)
+        pool->queue = new;
+    else
+        last->tail = new;
 
     // initialize new element
     new->routine = routine;
@@ -78,7 +84,6 @@ int tpool_add_work(tpool_t *pool, void *(*routine)(void *), void *arg) {
 }
 
 int tpool_destroy(tpool_t *pool, char join) {
-    tpool_queue *c, *d;
 
     pthread_mutex_lock(&pool->lock);
 
@@ -86,15 +91,15 @@ int tpool_destroy(tpool_t *pool, char join) {
     pool->max_queue_size = pool->max_thread_count = 0;
 
     // iterate through queue and free
-    while(c != NULL) {
-        c = pool->queue;
-
-        if(join && c->has_thread) { // if supposed to wait for threads to end
-            pthread_join(c->thread, NULL);
+    while(pool->queue != NULL) {
+        if(join && pool->queue->has_thread) { // if supposed to wait for threads to end
+            pthread_join(pool->queue->thread, NULL);
         }
 
-        pool->queue = c->tail;
-        free(c);
+        tpool_queue *tmp;
+        tmp = pool->queue;
+        pool->queue = pool->queue->tail;
+        free(tmp);
     }
 
     pthread_mutex_unlock(&pool->lock);
@@ -102,18 +107,36 @@ int tpool_destroy(tpool_t *pool, char join) {
 }
 
 int tpool_update(tpool_t *pool) {
-    tpool_queue *c;
+    tpool_queue *c, *d;
+
+    pthread_mutex_lock(&pool->lock);
+
+    if(pool->queue == NULL) {
+        pthread_mutex_unlock(&pool->lock);
+        return 0;
+    }
 
     // cleanup queue
-    for(c = pool->queue; c->tail != NULL; c = c->tail) {
-        if(!c->tail->has_thread)
-            continue;
-        if(pthread_tryjoin_np(c->tail->thread, NULL) != EBUSY) {
-            tpool_queue *tmp;
-            tmp = c->tail;
-            c->tail = c->tail->tail;
-            free(tmp);
+    d = NULL;
+    c = pool->queue;
+    while(c != NULL) {
+        if(c->has_thread) {
+            if(pthread_tryjoin_np(c->thread, NULL) != EBUSY) {
+                if(d == NULL) {
+                    pool->queue = c->tail;
+                    free(c);
+                    c = pool->queue;
+                } else {
+                    d->tail = c->tail;
+                    free(c);
+                    c = d->tail;
+                }
+                continue;
+            }
         }
+
+        d = c;
+        c = c->tail;
     }
 
     // run 
@@ -129,5 +152,6 @@ int tpool_update(tpool_t *pool) {
         }
     }
 
+    pthread_mutex_unlock(&pool->lock);
     return 0;
 }
