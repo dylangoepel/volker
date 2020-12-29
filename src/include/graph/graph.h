@@ -34,4 +34,7 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count);
 // recursive searching
 gr_node *gr_find_by_id(gr_node *graph, vlkr_id id);
 
+int gr_free_node(gr_node *n);
+int gr_free_graph(gr_node *g);
+
 #endif

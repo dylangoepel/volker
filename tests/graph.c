@@ -59,6 +59,10 @@ int main() {
     char *buffer = gr_serialize(nodes[0], &buffer_size); 
     if(buffer == NULL)
         return EXIT_SERIALIZE_ERROR;
+    free(buffer);
+
+    gr_free_graph(nodes[0]);
+    gr_free_node(nodes[5]);
 
     return 0;
     

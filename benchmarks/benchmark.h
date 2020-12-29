@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#define ITERATION_COUNT 10000
+#define ITERATION_COUNT 1000
 
 
 typedef struct {

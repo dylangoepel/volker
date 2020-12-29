@@ -38,5 +38,7 @@ int main() {
         }
         bm_end(&b);
         bm_write(&b, "gr_connect triple");
+
+        gr_free_graph(nodes[0]);
     }
 }

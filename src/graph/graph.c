@@ -122,15 +122,37 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
 
 gr_node *gr_find_by_id(gr_node *graph, vlkr_id id) {
     uint32_t node_count;
-    gr_node **nodes = gr_linearize(graph, &node_count);
+    gr_node **nodes = gr_linearize(graph, &node_count), *ret = NULL;
 
     for(uint32_t i = 0; i < node_count; ++i) {
         if(nodes[i]->id == id) {
-            gr_node *ret = nodes[i];
-            free(nodes);
-            return ret;
+            ret = nodes[i];
+            break;
         }
     }
 
-    return NULL;
+    free(nodes);
+    return ret;
+}
+
+int gr_free_node(gr_node *n) {
+    free(n->neighbor);
+    free(n);
+    return 0;
+}
+
+int gr_free_graph(gr_node *g) {
+    gr_node **linear;
+    uint32_t count;
+
+    linear = gr_linearize(g, &count);
+    if(linear == NULL)
+        return -1;
+
+    for(int i = 0; i < count; ++i) {
+        gr_free_node(linear[i]);
+    }
+
+    free(linear);
+    return 0;
 }

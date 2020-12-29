@@ -60,8 +60,11 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
 char *gr_serialize(gr_node *graph, uint32_t *size) {
     gr_node **nodes;
     uint32_t count = 0;
+    char *ret;
 
     nodes = gr_linearize(graph, &count);
 
-    return gr_serialize_linear(nodes, count, size);
+    ret = gr_serialize_linear(nodes, count, size);
+    free(nodes);
+    return ret;
 }

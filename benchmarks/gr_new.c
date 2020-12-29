@@ -17,7 +17,7 @@ int main() {
         bm_end(&b);
         bm_write(&b, "gr_new");
         for(int i = 0; i < NODE_COUNT; ++i)
-            free(nodes[i]);
+            gr_free_node(nodes[i]);
     }
 
     return 0;
