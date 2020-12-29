@@ -1,0 +1,1 @@
+In this dir are all the default attack modules the botnet should have by default. 
