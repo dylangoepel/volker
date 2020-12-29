@@ -53,8 +53,8 @@ int srv_listen(srv_ctx *server, void*(*handler)(void *)) {
         printf("[\e[31mERROR\e[00m] Unable to listen: %s\n", strerror(errno));
         return -1;
     }
-
-    while((sock = accept(server->listener, (struct sockaddr*)&addr, &len) > 0)) {
+    for(;;){
+      sock = accept(server->listener, (struct sockaddr*)&addr, &len);
         srv_connection_ctx *client = NULL;
 
         client = malloc(sizeof(srv_connection_ctx *));
@@ -68,9 +68,11 @@ int srv_listen(srv_ctx *server, void*(*handler)(void *)) {
 
         if (tpool_add_work(&main_pool, handler, (void *)client) < 0) {
             printf("[\e[31mERROR\e[00m] Unable to add work to thread pool : %s\n", strerror(errno));
-            continue;
+            break;
         }
+	client = 0;
     }
     tpool_destroy(&main_pool, 1);
     return -1;
 }
+
