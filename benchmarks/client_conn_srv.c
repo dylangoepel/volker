@@ -12,16 +12,8 @@
 
 #define MSG_LENGHT 20
 
-/*
-Something at recfrom is wrong. Its the client->socket . You can try it by starting this exe and then telneting to localhost 5632
-
-the snd_msg function works with the client but the server cant handle the request and crashes at res == -1
-
-and sometimes it just doesent show anything
-*/
-
 int snd_msg(client_conn_ctx * arg){
-  char msg[MSG_LENGHT] = "Test";
+  char msg[MSG_LENGHT] = "Test Nachricht";
   if(send(arg->socket, msg, strlen(msg) +1,0) < 0)
     return -1;
 
@@ -32,9 +24,9 @@ int snd_msg(client_conn_ctx * arg){
 void rcv_msg(void *arg){
   int res;
   char rec_msg[MSG_LENGHT];
-  char lop[MSG_LENGHT] = "Test";
+  char lop[MSG_LENGHT] = "Test Nachricht";
   srv_connection_ctx *client = NULL;
-  client = malloc(sizeof(srv_connection_ctx * ));
+  client = malloc(sizeof(srv_connection_ctx *));
   
   if(client == NULL){
      printf("[\e[31mERROR\e[00m] Unable to allocate memory: %s\n", strerror(errno));
@@ -49,11 +41,9 @@ void rcv_msg(void *arg){
       fprintf(stderr, "Server disconnected: %s\n", strerror(errno));
       break;
     }
-    else  if(strcmp(lop, rec_msg))
-	printf("%s","Succses");
+    else if(strcmp(lop, rec_msg))
+      break;
       
-      else
-	printf("%s", "Nope");
   }
 }
 
@@ -85,14 +75,22 @@ void client(){
 
 int main(){
 
-  // you can // tpool init and add and run only server(); as described above
   tpool_t haupt;
+  benchmark ben;
   tpool_init(&haupt, 2, 4);
+
+  bm_start(&ben);
   tpool_add_work(haupt, server, NULL);
-  //if you use it like here use sleep
+  bm_end(&ben);
+  bm_write(&ben, "intit and listen server");
+  
   sleep(1);
+  
+  bm_start(&ben);
   client();
-  //server();
+  bm_stop(&ben);
+  bm_write(&ben, "init client and send test msg");
+
   tpool_destroy(haupt, 1);
 
 }
