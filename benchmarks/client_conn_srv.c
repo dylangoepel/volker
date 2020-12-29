@@ -9,6 +9,7 @@
 #include "net/server.h"
 #include "net/client.h"
 #include "tpool/tpool.h"
+#include "benchmark.h"
 
 #define MSG_LENGHT 20
 
@@ -54,7 +55,7 @@ void server(){
   if(srv_init(&main) < 0)
     printf("%s","Error in srv_init");
 
-  if(srv_listen(&main, rcv_msg) < 0)
+  if(srv_listen(&main, &rcv_msg) < 0)
     printf("%s","Error srv_listen");     
 }
 
@@ -80,7 +81,7 @@ int main(){
   tpool_init(&haupt, 2, 4);
 
   bm_start(&ben);
-  tpool_add_work(haupt, server, NULL);
+  tpool_add_work(&haupt, &server, NULL);
   bm_end(&ben);
   bm_write(&ben, "intit and listen server");
   
@@ -91,6 +92,6 @@ int main(){
   bm_stop(&ben);
   bm_write(&ben, "init client and send test msg");
 
-  tpool_destroy(haupt, 1);
+  tpool_destroy(&haupt, 1);
 
 }
