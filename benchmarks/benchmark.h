@@ -8,8 +8,6 @@
 #define ITERATION_COUNT 10000
 
 
-void aufg(void *arg);
-
 typedef struct {
     struct timeval start, end;
 }benchmark;

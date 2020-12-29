@@ -1,195 +1,133 @@
+#define _GNU_SOURCE
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <unistd.h> 
 #include <sys/types.h> 
 #include <string.h> 
 #include <pthread.h> 
+#include <errno.h> 
+
 #include "tpool/tpool.h" 
- 
 
-void *tpool_thread(void *); 
- 
-void tpool_init(tpool_t *tpoolp, size_t num, size_t max_queue_size) 
-{ 
-  int i; 
-  tpool_t pool;
-  
- 
+#define ERROR_FULLQUEUE -2
 
-  pool = (tpool_t)malloc(sizeof(struct tpool)); 
-  if (pool == NULL) { 
-    perror("malloc"); 
-    exit(0); 
-  } 
- 
-  pool->num_threads = 0; 
-  pool->max_queue_size = max_queue_size + 1; 
-  pool->num_threads = num; 
-  pool->tpid = NULL; 
-  pool->front = 0; 
-  pool->rear = 0; 
-  pool->queue_closed = 0; 
-  pool->shutdown = 0; 
- 
-  if (pthread_mutex_init(&pool->queue_lock, NULL) == -1) { 
-    perror("pthread_mutex_init"); 
-    free(pool); 
-    exit(0); 
-  } 
-  if (pthread_cond_init(&pool->queue_has_space, NULL) == -1) { 
-    perror("pthread_mutex_init"); 
-    free(pool); 
-    exit(0); 
-  } 
-  if (pthread_cond_init(&pool->queue_has_task, NULL) == -1) { 
-    perror("pthread_mutex_init"); 
-    free(pool); 
-    exit(0); 
-  } 
-  if (pthread_cond_init(&pool->queue_empty, NULL) == -1) { 
-    perror("pthread_mutex_init"); 
-    free(pool); 
-    exit(0); 
-  } 
- 
-  if ((pool->queue = malloc(sizeof(struct tpool_work) *  
-          pool->max_queue_size)) == NULL) { 
-    perror("malloc"); 
-    free(pool); 
-    exit(0); 
-  } 
- 
-  if ((pool->tpid = malloc(sizeof(pthread_t) * num)) == NULL) { 
-    perror("malloc"); 
-    free(pool); 
-    free(pool->queue); 
-    exit(0); 
-  } 
- 
-  for (i = 0; i < num; i++) { 
-    if (pthread_create(&pool->tpid[i], NULL, tpool_thread,  
-          (void *)pool) != 0) { 
-      perror("pthread_create"); 
-      exit(0); 
-    } 
-    else if (pthread_detach(pool->tpid[i]) != 0) { 
-      perror("pthread_detach"); 
-      exit(0); 
-    } 
-   } 
- 
-  *tpoolp = pool; 
-} 
- 
- 
-int empty(tpool_t pool) 
-{ 
-  return pool->front == pool->rear; 
-} 
- 
-int full(tpool_t pool) 
-{ 
-  return ((pool->rear + 1) % pool->max_queue_size == pool->front); 
-} 
- 
-int size(tpool_t pool) 
-{ 
-  return (pool->rear + pool->max_queue_size - 
-        pool->front) % pool->max_queue_size; 
-} 
- 
-int tpool_add_work(tpool_t tpool, void(*routine)(void *), void *arg) 
-{ 
-  tpool_work_t *temp; 
- 
-  pthread_mutex_lock(&tpool->queue_lock); 
- 
-  while (full(tpool) && !tpool->shutdown && !tpool->queue_closed) { 
-    pthread_cond_wait(&tpool->queue_has_space, &tpool->queue_lock); 
-  } 
- 
-  if (tpool->shutdown || tpool->queue_closed) { 
-    pthread_mutex_unlock(&tpool->queue_lock); 
-    return -1; 
-  } 
- 
-  int is_empty = empty(tpool); 
- 
-  temp = tpool->queue + tpool->rear; 
-  temp->routine = routine; 
-  temp->arg = arg; 
-  tpool->rear = (tpool->rear + 1) % tpool->max_queue_size; 
- 
-  if (is_empty) { 
-    
-    pthread_cond_broadcast(&tpool->queue_has_task); 
-  } 
- 
-  pthread_mutex_unlock(&tpool->queue_lock);   
- 
-  return 0; 
-} 
- 
-void *tpool_thread(void *arg) 
-{ 
-  tpool_t pool = (tpool_t)(arg); 
-  tpool_work_t *work; 
- 
-  for (;;) { 
-    pthread_mutex_lock(&pool->queue_lock); 
- 
-    while (empty(pool) && !pool->shutdown) { 
-      pthread_cond_wait(&pool->queue_has_task, &pool->queue_lock); 
-    } 
- 
-    if (pool->shutdown == 1) { 
-      pthread_mutex_unlock(&pool->queue_lock); 
-      pthread_exit(NULL); 
-    } 
- 
-    int is_full = full(pool); 
-    work = pool->queue + pool->front; 
-    pool->front = (pool->front + 1) % pool->max_queue_size; 
- 
-    if (is_full) { 
-      pthread_cond_broadcast(&pool->queue_has_space); 
-    } 
- 
-    if (empty(pool)) { 
-      pthread_cond_signal(&pool->queue_empty); 
-    } 
- 
-    pthread_mutex_unlock(&pool->queue_lock);   
- 
-    (*(work->routine))(work->arg); 
-  } 
-} 
- 
-int tpool_destroy(tpool_t tpool, int finish) 
-{ 
-  int   i; 
- 
-  pthread_mutex_lock(&tpool->queue_lock); 
- 
-  tpool->queue_closed = 1; 
- 
-  if (finish == 1) { 
-    while (!empty(tpool)) { 
-      pthread_cond_wait(&tpool->queue_empty, &tpool->queue_lock); 
-    } 
-  } 
-  tpool->shutdown = 1; 
- 
-  pthread_mutex_unlock(&tpool->queue_lock); 
- 
-  pthread_cond_broadcast(&tpool->queue_has_task); 
- 
-  for (i = 0; i < tpool->num_threads; i++) { 
-    pthread_join(tpool->tpid[i], NULL); 
-  } 
- 
-  free(tpool->tpid); 
-  free(tpool->queue); 
-  free(tpool);
-  return 0;
-} 
+static inline int _tpool_queue_len(tpool_queue *q) {
+    tpool_queue *c;
+    int len = 0;
+
+    for(c = q; c != NULL; c = c->tail)
+        ++len;
+
+    return len;
+}
+
+static inline tpool_queue *_tpool_queue_last(tpool_queue *q) {
+    tpool_queue *c;
+
+    for(c = q; c->tail != NULL; c = c->tail) {}
+
+    return c;
+}
+
+static inline int _tpool_queue_thread_count(tpool_queue *q) {
+    tpool_queue *c;
+    int thread_count = 0;
+
+    for(c = q; c != NULL; c = c->tail) {
+        if(c->has_thread)
+            ++thread_count;
+    }
+
+    return thread_count;
+}
+
+int tpool_init(tpool_t *pool, int thread_count, int queue_size) {
+    pool->max_queue_size = queue_size;
+    pool->max_thread_count = thread_count;
+    if(pthread_mutex_init(&pool->lock, NULL) < 0)
+        return -1;
+    pool->queue = NULL;
+    return 0;
+}
+
+int tpool_add_work(tpool_t *pool, void *(*routine)(void *), void *arg) {
+    // TODO: proper error handling
+    tpool_queue *new;
+    pthread_mutex_lock(&pool->lock);
+
+    if(_tpool_queue_len(pool->queue) >= pool->max_queue_size)
+        return ERROR_FULLQUEUE;
+
+    new = malloc(sizeof(tpool_queue));
+    if(new == NULL)
+        return -1;
+
+    // connect new element to queue
+    _tpool_queue_last(pool->queue)->tail = new;
+
+    // initialize new element
+    new->routine = routine;
+    new->arg = arg;
+    new->has_thread = 0;
+    new->tail = NULL;
+
+    pthread_mutex_unlock(&pool->lock);
+
+    tpool_update(pool);
+    return 0;
+}
+
+int tpool_destroy(tpool_t *pool, char join) {
+    tpool_queue *c, *d;
+
+    pthread_mutex_lock(&pool->lock);
+
+    // signalize shutdown to possible tpool updater thread
+    pool->max_queue_size = pool->max_thread_count = 0;
+
+    // iterate through queue and free
+    while(c != NULL) {
+        c = pool->queue;
+
+        if(join && c->has_thread) { // if supposed to wait for threads to end
+            pthread_join(c->thread, NULL);
+        }
+
+        pool->queue = c->tail;
+        free(c);
+    }
+
+    pthread_mutex_unlock(&pool->lock);
+    return 0;
+}
+
+int tpool_update(tpool_t *pool) {
+    tpool_queue *c;
+
+    // cleanup queue
+    for(c = pool->queue; c->tail != NULL; c = c->tail) {
+        if(!c->tail->has_thread)
+            continue;
+        if(pthread_tryjoin_np(c->tail->thread, NULL) != EBUSY) {
+            tpool_queue *tmp;
+            tmp = c->tail;
+            c->tail = c->tail->tail;
+            free(tmp);
+        }
+    }
+
+    // run 
+    int thread_count = _tpool_queue_thread_count(pool->queue);
+    if(thread_count < pool->max_thread_count) {
+        for(c = pool->queue; (c != NULL) &&
+                (thread_count != pool->max_thread_count); c = c->tail) {
+            if(c->has_thread)
+                continue;
+            pthread_create(&c->thread, NULL, c->routine, c->arg);
+            c->has_thread = 1;
+            thread_count++;
+        }
+    }
+
+    return 0;
+}

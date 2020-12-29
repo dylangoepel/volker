@@ -5,12 +5,13 @@
 #include "tpool/tpool.h"
 #include "benchmark.h"
 
-#define NUM_THREADS 50
+#define NUM_THREADS 20
 #define MAX_QUEUE 40
 
-void aufg(void *arg){
+void *aufg(void *arg){
   int a = (int) arg;
   a++;
+  return NULL;
 }
 
 
@@ -25,13 +26,13 @@ int main(){
 
   bm_start(&ben);
   for(int i = 0; i < 30; ++i){
-    tpool_add_work(test, aufg, (void *)(uintptr_t)i);
+    tpool_add_work(&test, &aufg, (void*) i);
   }
   bm_end(&ben);
   bm_write(&ben, "tpool_add_work(20)");
 
   bm_start(&ben);
-  tpool_destroy(test, 0);
+  tpool_destroy(&test, 0);
   bm_end(&ben);
   bm_write(&ben, "tpool_destroy");
 }

@@ -5,10 +5,11 @@
 #include "graph/graph.h"
 #include "graph/serial.h"
 
-static inline char *__push_onto_buffer(char **buffer, uint32_t *buffer_size, uint32_t *used_size, char *data, uint32_t data_size) {
+static inline void *__push_onto_buffer(char **buffer, uint32_t *buffer_size, uint32_t *used_size, char *data, uint32_t data_size) {
     ensure_space(buffer, buffer_size, *used_size, data_size);
     memcpy(*buffer + *used_size, data, data_size);
     *used_size += data_size;
+    return buffer + *used_size;
 }
 
 char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {

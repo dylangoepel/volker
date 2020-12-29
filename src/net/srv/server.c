@@ -40,7 +40,7 @@ int srv_init(srv_ctx *server) {
 }
 
 // start listener and run handler on incoming connections
-int srv_listen(srv_ctx *server, void(*handler)(void *)) {
+int srv_listen(srv_ctx *server, void*(*handler)(void *)) {
     int sock;
     struct sockaddr_in addr;
     socklen_t len = sizeof(struct sockaddr_in);
@@ -66,11 +66,11 @@ int srv_listen(srv_ctx *server, void(*handler)(void *)) {
         client->socket = sock;
         /*puts new connection to the list*/
 
-        if (tpool_add_work(main_pool, handler, (void *)client) < 0) {
+        if (tpool_add_work(&main_pool, handler, (void *)client) < 0) {
             printf("[\e[31mERROR\e[00m] Unable to add work to thread pool : %s\n", strerror(errno));
             continue;
         }
     }
-    tpool_destroy(main_pool, 1);
+    tpool_destroy(&main_pool, 1);
     return -1;
 }
