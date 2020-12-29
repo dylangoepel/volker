@@ -89,7 +89,7 @@ int main(){
   
   bm_start(&ben);
   client();
-  bm_stop(&ben);
+  bm_end(&ben);
   bm_write(&ben, "init client and send test msg");
 
   tpool_destroy(&haupt, 1);
