@@ -27,11 +27,11 @@
     }
 
 #define realloc_or_fail(ptr, size) { \
-    void *newptr = realloc(*ptr, size); \
+    void *newptr = realloc(ptr, size); \
     if(newptr == NULL) { \
         fail_free(ptr); \
     } \
-    *ptr = newptr; \
+    ptr = newptr; \
     }
 
 #define ensure_space(ptr, size, used, additional) { \

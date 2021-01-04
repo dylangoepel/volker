@@ -120,9 +120,8 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count) {
     return buffer;
 }
 
-gr_node *gr_find_by_id(gr_node *graph, vlkr_id id) {
-    uint32_t node_count;
-    gr_node **nodes = gr_linearize(graph, &node_count), *ret = NULL;
+gr_node *gr_find_by_id_linear(gr_node **nodes, uint32_t node_count, vlkr_id id) {
+    gr_node *ret = NULL;
 
     for(uint32_t i = 0; i < node_count; ++i) {
         if(nodes[i]->id == id) {
@@ -131,8 +130,13 @@ gr_node *gr_find_by_id(gr_node *graph, vlkr_id id) {
         }
     }
 
-    free(nodes);
     return ret;
+}
+
+gr_node *gr_find_by_id(gr_node *graph, vlkr_id id) {
+    uint32_t node_count;
+    gr_node **nodes = gr_linearize(graph, &node_count);
+    return gr_find_by_id_linear(nodes, node_count, id);
 }
 
 int gr_free_node(gr_node *n) {

@@ -18,7 +18,6 @@ struct gr_node_atom {
 
     // neighbors
     atomid neighbors;
-    uint32_t neighbor_count;
 };
 
 struct gr_list_atom {
@@ -30,5 +29,6 @@ struct gr_list_atom {
 };
 
 char *gr_serialize(gr_node *graph, uint32_t *size);
+gr_node **gr_deserialize(char *buffer, uint32_t size, int *node_count);
 
 #endif

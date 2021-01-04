@@ -8,6 +8,7 @@
 #define EXIT_LINEARIZE_SIZE_ERROR 3
 #define EXIT_LINEARIZE_SUM_ERROR 4
 #define EXIT_DCONNECT_ERROR 5
+#define EXIT_DESERIALIZE_ERROR 6
 
 
 int main() {
@@ -59,6 +60,21 @@ int main() {
     char *buffer = gr_serialize(nodes[0], &buffer_size); 
     if(buffer == NULL)
         return EXIT_SERIALIZE_ERROR;
+
+    /* test deserialization */
+    int node_count;
+    gr_node **denodes = gr_deserialize(buffer, buffer_size, &node_count);
+    if(node_count != 5)
+        return EXIT_DESERIALIZE_ERROR;
+    idsum = 0;
+    for(int i = 0; i < 5; ++i) {
+        idsum += denodes[i]->id;
+    }
+    if(idsum != 10)
+        return EXIT_DESERIALIZE_ERROR;
+
+    gr_free_graph(denodes[0]);
+
     free(buffer);
 
     gr_free_graph(nodes[0]);
