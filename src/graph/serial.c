@@ -6,7 +6,7 @@
 #include "graph/serial.h"
 
 static inline void *__push_onto_buffer(char **buffer, uint32_t *buffer_size, uint32_t *used_size, char *data, uint32_t data_size) {
-    ensure_space(buffer, buffer_size, *used_size, data_size);
+    ensure_space_ret(buffer, buffer_size, *used_size, data_size, NULL);
     memcpy(*buffer + *used_size, data, data_size);
     *used_size += data_size;
     return buffer + *used_size;
@@ -18,7 +18,7 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
     atomid current_id = 0;
     atom_type atype;
 
-    alloc_null(buffer, buffer_size);
+    alloc_ret(buffer, buffer_size, NULL);
 
     // write all nodes
     for(int i = 0; i < count; ++i) {
@@ -51,7 +51,7 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
         }
     }
 
-    realloc_or_fail(buffer, used_size);
+    realloc_or_fail_ret(buffer, used_size, NULL);
     *size = used_size;
     return buffer;
 }
@@ -119,7 +119,7 @@ vlkr_id *gr_deserialize_list(char *buffer, uint32_t buffer_size, atomid location
     allocated_size = MEM_ALLOC_BLOCK;
 
     vlkr_id *ret;
-    alloc_null(ret, allocated_size);
+    alloc_ret(ret, allocated_size, NULL);
 
     for(int i = 0; 1; ++i) {
          // check whether current list item has already been added to array
@@ -142,7 +142,7 @@ vlkr_id *gr_deserialize_list(char *buffer, uint32_t buffer_size, atomid location
             return NULL;
         }
 
-        ensure_space(ret, &allocated_size, i * sizeof(vlkr_id), sizeof(vlkr_id));
+        ensure_space_ret(ret, &allocated_size, i * sizeof(vlkr_id), sizeof(vlkr_id), NULL);
         ret[i] = item->current;
 
         location = item->tail;
@@ -162,7 +162,7 @@ gr_node **gr_deserialize(char *buffer, uint32_t size, int *node_count) {
     uint32_t i;
     int allocated_size = MEM_ALLOC_BLOCK;
 
-    alloc_null(nodes, allocated_size);
+    alloc_ret(nodes, allocated_size, NULL);
 
     // collect all nodes
     for(i = 0;  bound - location >= sizeof(atom_type); ++i) {
