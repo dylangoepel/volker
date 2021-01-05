@@ -48,38 +48,42 @@ int __write_file(ssh_session *session, ssh_scp *scp){
   // read binary file
   fd = open(EXE_NAME, O_RDONLY);
   if(fd == -1) {
-      return -1;
+    return -1;
   }
 
   exe = malloc(MEM_ALLOC_BLOCK);
-  if(exe == NULL)
-      return -1;
+  if(exe == NULL) {
+    close(fd);
+    return -1;
+  }
 
   while(len > 0) {
-      ensure_space(exe, &exe_allocated, exe_used, MEM_ALLOC_BLOCK);
-      len = read(fd, exe + exe_used, MEM_ALLOC_BLOCK);
-      exe_used += len;
+    ensure_space(exe, &exe_allocated, exe_used, MEM_ALLOC_BLOCK);
+    len = read(fd, exe + exe_used, MEM_ALLOC_BLOCK);
+    if(len < 0) {
+      free(exe);
+      close(fd);
+      return len;
+    }
+    exe_used += len;
   }
   close(fd);
 
   //create dir in ~/.conf_local
   rc = ssh_scp_push_directory(*scp, ".conf_local", NET_PER);
   if(rc!=SSH_OK){
-    fprintf(stderr, "not able to create dir: %s\n", ssh_get_error(*session));
     free(exe);
     return rc;
   }
   
   rc = ssh_scp_push_file (*scp, EXE_NAME, exe_used, NET_PER);
   if(rc!=SSH_OK){
-    fprintf(stderr, "not able to create file in remote: %s\n", ssh_get_error(*session));
     free(exe);
     return rc;
   }
 
   rc = ssh_scp_write(*scp, exe_used, len);
   if(rc!=SSH_OK){
-    fprintf(stderr, "not able to write to remote: %s\n", ssh_get_error(*session));
     free(exe);
     return rc;
   }
