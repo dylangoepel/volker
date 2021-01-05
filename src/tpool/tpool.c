@@ -53,7 +53,6 @@ int tpool_init(tpool_t *pool, int thread_count, int queue_size) {
 }
 
 int tpool_add_work(tpool_t *pool, void *(*routine)(void *), void *arg) {
-    // TODO: proper error handling
     tpool_queue *new, *last;
     pthread_mutex_lock(&pool->lock);
 
@@ -61,8 +60,10 @@ int tpool_add_work(tpool_t *pool, void *(*routine)(void *), void *arg) {
         return ERROR_FULLQUEUE;
 
     new = malloc(sizeof(tpool_queue));
-    if(new == NULL)
+    if(new == NULL) {
+        pthread_mutex_unlock(&pool->lock);
         return -1;
+    }
 
     // connect new element to queue
     last = _tpool_queue_last(pool->queue);
