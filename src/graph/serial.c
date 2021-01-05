@@ -121,9 +121,14 @@ vlkr_id *gr_deserialize_list(char *buffer, uint32_t buffer_size, atomid location
     vlkr_id *ret;
     alloc_null(ret, allocated_size);
 
-    // TODO prevent infinite recursion
-
     for(int i = 0; 1; ++i) {
+         // check whether current list item has already been added to array
+         // in order to prevent infinite recursion
+        for(int k = 0; k < i; ++k) {
+            if(ret[k] == location)
+                break;
+        }
+
         if(location == ATOMID_INVALID) {
             *count = i;
             (void) realloc(ret, i * sizeof(vlkr_id));
