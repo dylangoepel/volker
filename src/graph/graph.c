@@ -1,7 +1,15 @@
 #include "graph/graph.h"
+#include "mem.h"
 
 #include <stdlib.h>
 #include <string.h> // memmove
+
+// key-value pair associating a vlkr_id to an integer distance
+// used in gr_shortest_path_len
+struct _gr_distance_kv {
+    vlkr_id id;
+    int dist;
+};
 
 // exhaustive search for pointer in pointer array, returns bool
 uint8_t __chk_ptr_in_array(void *a[], uint32_t c, void *ptr) {

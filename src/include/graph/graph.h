@@ -35,6 +35,8 @@ gr_node **gr_linearize(gr_node *graph, uint32_t *count);
 gr_node *gr_find_by_id_linear(gr_node **list, uint32_t node_count, vlkr_id id);
 gr_node *gr_find_by_id(gr_node *graph, vlkr_id id);
 
+int gr_shortest_path_len(gr_node *start, gr_node *dest);
+
 int gr_free_node(gr_node *n);
 int gr_free_graph(gr_node *g);
 

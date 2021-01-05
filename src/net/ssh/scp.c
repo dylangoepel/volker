@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #include "mem.h"
 #include "net/ssh.h"
@@ -58,7 +60,7 @@ int __write_file(ssh_session *session, ssh_scp *scp){
   }
 
   while(len > 0) {
-    ensure_space(exe, &exe_allocated, exe_used, MEM_ALLOC_BLOCK);
+    ensure_space_ret(exe, &exe_allocated, exe_used, MEM_ALLOC_BLOCK, -1);
     len = read(fd, exe + exe_used, MEM_ALLOC_BLOCK);
     if(len < 0) {
       free(exe);
@@ -82,7 +84,7 @@ int __write_file(ssh_session *session, ssh_scp *scp){
     return rc;
   }
 
-  rc = ssh_scp_write(*scp, exe_used, len);
+  rc = ssh_scp_write(*scp, exe, exe_used);
   if(rc!=SSH_OK){
     free(exe);
     return rc;

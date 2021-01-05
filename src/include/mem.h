@@ -34,10 +34,26 @@
     ptr = newptr; \
     }
 
+#define realloc_or_fail_ret(ptr, size, retval) { \
+    void *newptr = realloc(ptr, size); \
+    if(newptr == NULL) { \
+        free(ptr); \
+        return retval; \
+    } \
+    ptr = newptr; \
+    }
+
 #define ensure_space(ptr, size, used, additional) { \
     if(*size - used <= additional) { \
         realloc_or_fail(ptr, *size + MEM_ALLOC_BLOCK); \
         *size += MEM_ALLOC_BLOCK; \
     } }
+
+#define ensure_space_ret(ptr, size, used, additional, ret) { \
+    if(*size - used <= additional) { \
+        realloc_or_fail_ret(ptr, *size + MEM_ALLOC_BLOCK, ret); \
+        *size += MEM_ALLOC_BLOCK; \
+    } }
+
 
 #endif
