@@ -178,7 +178,9 @@ gr_node **gr_deserialize(char *buffer, uint32_t size, int *node_count) {
         atom = (struct gr_node_atom *) (location + sizeof(atom_type));
         ids = gr_deserialize_list(buffer, size, atom->neighbors, &ids_size);
         if(ids == NULL) {
-            // TODO free previous id arrays
+            // free previously allocated arrays
+            for(int k = 0; k < i; ++k)
+                free(nodes[i]->neighbor);
             return NULL;
         }
 
@@ -199,10 +201,11 @@ gr_node **gr_deserialize(char *buffer, uint32_t size, int *node_count) {
 
         nodes[k]->neighbor = malloc(nodes[k]->neighbor_count * sizeof(struct gr_node *));
         for(int n = 0; n < nodes[k]->neighbor_count; ++n) {
-            if((nodes[k]->neighbor[n] = gr_find_by_id_linear(nodes, i, ids[n])) == NULL) {
-                free(nodes);
-                // TODO free everything
-                return NULL;
+            if((nodes[k]->neighbor[n] = gr_find_by_id_linear(nodes, i, ids[n])) == NULL) { // node cannot be found
+                --n;
+                memmove(ids + n, ids + n + 1, (nodes[k]->neighbor_count - n) * sizeof(vlkr_id));
+                --nodes[k]->neighbor_count;
+                continue;
             }
         }
         free(ids);
