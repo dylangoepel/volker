@@ -71,7 +71,6 @@ int gr_connect(gr_node *n1, gr_node *n2) {
     return 0;
 }
 
-//its broke i fix it tomorrow
 int gr_dconnect(gr_node *n1, gr_node *n2) {
     uint32_t entries_removed = 0;
     for(uint32_t i = 0; i < n1->neighbor_count; ++i) {
