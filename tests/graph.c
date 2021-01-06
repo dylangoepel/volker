@@ -10,8 +10,17 @@
 #define EXIT_DCONNECT_ERROR 5
 #define EXIT_DESERIALIZE_ERROR 6
 
+#define run_test(t) { \
+    if((ret = t()) != 0) \
+        return ret; \
+    }
 
-int main() {
+const char testdata_serialized_invalid_atomid[] = {
+    12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+};
+
+/* this function contains usage of the graph api as it is expected to look like in the actual code */ 
+int test_basic() {
     gr_node *nodes[6];
 
     /* build graph */
@@ -81,5 +90,16 @@ int main() {
     gr_free_node(nodes[5]);
 
     return 0;
-    
+}
+
+/* this functions tests the gr_serialize function's stability by giving examples of malicious input */
+int test_stability_serialize() {
+    return 0;
+}
+
+int main() {
+    int ret;
+    run_test(test_basic);
+    run_test(test_stability_serialize);
+    return 0;
 }

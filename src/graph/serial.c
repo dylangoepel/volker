@@ -15,8 +15,8 @@ static inline void *__push_onto_buffer(char **buffer, uint32_t *buffer_size, uin
 char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
     char *buffer;
     uint32_t buffer_size = MEM_ALLOC_BLOCK, used_size = 0;
-    atomid current_id = 0;
     atom_type atype;
+    atomid id = 1;
 
     alloc_ret(buffer, buffer_size, NULL);
 
@@ -29,7 +29,7 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
         current_node_atom.addr = current_node->addr;
 
         if(current_node->neighbor_count > 0) {
-            current_node_atom.neighbors = current_id + 1; // neighbor list begins with next atom
+            current_node_atom.neighbors = id + 1; // neighbor list begins with next atom
         } else {
             current_node_atom.neighbors = ATOMID_INVALID;
         }
@@ -37,17 +37,20 @@ char *gr_serialize_linear(gr_node **nodes, uint32_t count, uint32_t *size) {
         atype = ATYPE_NODE;
         __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&atype), sizeof(atype));
         __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&current_node_atom), sizeof(current_node_atom));
+        ++id;
 
         /* write neighbors */
         for(int ni = 0; ni < current_node->neighbor_count; ++ni) {
             struct gr_list_atom current_neighbor_atom;
 
             current_neighbor_atom.current = (*(current_node->neighbor + sizeof(void*) * ni))->id;
-            current_neighbor_atom.tail = ni == current_node->neighbor_count - 1 ? ATOMID_INVALID : current_id + 1;
+            current_neighbor_atom.tail = ni == current_node->neighbor_count - 1 ? ATOMID_INVALID : id + 1;
 
             atype = ATYPE_LIST;
             __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&atype), sizeof(atype));
             __push_onto_buffer(&buffer, &buffer_size, &used_size, ((char *)&current_neighbor_atom), sizeof(current_neighbor_atom));
+
+            ++id;
         }
     }
 
@@ -94,7 +97,7 @@ void *_gr_ser_cdr(char *buffer) {
 // read the nth atom of buffer or return NULL in case in case of error
 void *gr_seek_atom(char *buffer, uint32_t size, atomid id, atom_type *type) {
     const char *bound = buffer + size;
-    atomid cid = 0;
+    atomid cid = 1;
     while((buffer < bound) && (cid < id)) {
         buffer = _gr_ser_cdr(buffer);
         ++cid;
@@ -105,7 +108,7 @@ void *gr_seek_atom(char *buffer, uint32_t size, atomid id, atom_type *type) {
 
     memcpy(type, buffer, sizeof(atom_type));
 
-    if(bound - buffer <= sizeof(atom_type) + _gr_atype_to_size(*type))
+    if(bound - buffer < sizeof(atom_type) + _gr_atype_to_size(*type))
         return NULL;
 
     return buffer + sizeof(atom_type);
@@ -180,7 +183,7 @@ gr_node **gr_deserialize(char *buffer, uint32_t size, int *node_count) {
         if(ids == NULL) {
             // free previously allocated arrays
             for(int k = 0; k < i; ++k)
-                free(nodes[i]->neighbor);
+                free(nodes[k]->neighbor);
             return NULL;
         }
 

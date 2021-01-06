@@ -11,6 +11,7 @@ typedef uint32_t atomid;
 #define ATYPE_LIST 2
 typedef uint8_t atom_type;
 
+// 10 byte
 struct gr_node_atom {
     // current node
     vlkr_id id;
@@ -20,6 +21,7 @@ struct gr_node_atom {
     atomid neighbors;
 };
 
+// 6 byte
 struct gr_list_atom {
     // current node
     vlkr_id current;
