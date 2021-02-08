@@ -122,7 +122,7 @@ int tpool_update(tpool_t *pool) {
     c = pool->queue;
     while(c != NULL) {
         if(c->has_thread) {
-            if(pthread_tryjoin_np(c->thread, NULL) != EBUSY) {
+            if(pthread_join(c->thread, NULL) != EBUSY) {
                 if(d == NULL) {
                     pool->queue = c->tail;
                     free(c);
