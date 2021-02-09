@@ -7,8 +7,7 @@
 #include <errno.h>
 #include "net/client.h"
 
-/*TODO : give him a addr in client_init via char* or in the struct*/
-/*TODO : and create a handler with the tpool */
+/*TODO : create a handler with the tpool */
 int __client_connect(client_conn_ctx *client)
 {
 	if(connect(client->socket,(struct sockaddr*)&(client->local_client),sizeof(struct sockaddr_in)) < 0) {
@@ -21,9 +20,6 @@ int __client_connect(client_conn_ctx *client)
 
 int client_conn(client_conn_ctx *client, char* addr, unsigned int port)
 {
-  /*intit local_client sockaddr... */ 
-
-    
 	client->local_client.sin_family = AF_INET;
 	client->local_client.sin_port = htons(port);
 	client->local_client.sin_addr.s_addr = inet_addr(addr);

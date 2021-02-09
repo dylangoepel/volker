@@ -13,7 +13,7 @@
 #define QUEUE_SIZE 10
 #define SRV_PORT 5632
 // TODO: outsource error handling and make it quit
-// TODO : main function shuould create the thread pool
+
 // initialize and prepare a srv_ctx for listening
 int srv_init(srv_ctx *server) {
     // initialize thread array
@@ -64,7 +64,6 @@ int srv_listen(srv_ctx *server, void*(*handler)(void *)) {
         }
 
         client->socket = sock;
-        /*puts new connection to the list*/
 
         if (tpool_add_work(&main_pool, handler, (void *)client) < 0) {
             printf("[\e[31mERROR\e[00m] Unable to add work to thread pool : %s\n", strerror(errno));
