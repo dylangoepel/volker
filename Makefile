@@ -15,7 +15,7 @@ objects: $(objs)
 
 clean:
 	rm -f $(objs) $(testbin) bin/volker
-
+	rm -rf bin/test.pem
 
 obj/%.o: src/%.c
 	mkdir -p $(shell dirname $< | sed 's,src,obj,g')
