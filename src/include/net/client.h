@@ -7,7 +7,6 @@
 typedef struct {
 	struct sockaddr_in local_client;
 	int socket;
-	/*how should we tell which ip/addr to use */
 	struct in_addr * addr;
 }client_conn_ctx;
 

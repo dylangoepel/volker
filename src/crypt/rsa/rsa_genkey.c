@@ -4,6 +4,8 @@
 #include <openssl/err.h>
 #include <string.h>
 
+#include "crypto/rsa_genkey.h"
+
 #define RSA_KEY_EXPO 65537
 #define MIN_PW_LENGTH 12
 
@@ -20,7 +22,7 @@ void __free(RSA *r, BIGNUM *bn, BIO *bio){
         BIO_free_all(bio);
 }
 
-int write_private_key(RSA *rsa,  char *pw_in, char *fname){
+int write_private_key(RSA *rsa, char *pw_in, char *fname){
     FILE *fw;
     char *default_password = ")%e8pU6BL%H6WJ2>"; /*change it before spreading*/
     int def_pw_len = strlen(default_password);
@@ -35,7 +37,7 @@ int write_private_key(RSA *rsa,  char *pw_in, char *fname){
             return -3;
 
         fw = fopen(fname, "w");
-        if(PEM_write_RSAPrivateKey(fw, rsa, EVP_aes_256_cbc(), pw_in, pw_len, NULL, NULL) != 1)
+        if(PEM_write_RSAPrivateKey(fw, rsa, EVP_aes_256_cbc(), (unsigned char*)pw_in, pw_len, NULL, NULL) != 1)
             return -4;
 
         fclose(fw);
@@ -44,7 +46,7 @@ int write_private_key(RSA *rsa,  char *pw_in, char *fname){
 
     else{
         fw = fopen(fname, "w");
-        if(PEM_write_RSAPrivateKey(fw, rsa, EVP_aes_256_cbc(), default_password, def_pw_len, NULL, NULL) != 1)
+        if(PEM_write_RSAPrivateKey(fw, rsa, EVP_aes_256_cbc(), (unsigned char*)default_password, def_pw_len, NULL, NULL) != 1)
             return -5;
 
         fclose(fw);
@@ -70,7 +72,7 @@ char *export_private_key(RSA *rsa, char *pw_in){
         else if(pw_len < MIN_PW_LENGTH)
             return NULL;
 
-        if(PEM_write_bio_RSAPrivateKey(wkey, rsa, EVP_aes_256_cbc(), pw_in, pw_len, NULL, NULL) != 1)
+        if(PEM_write_bio_RSAPrivateKey(wkey, rsa, EVP_aes_256_cbc(), (unsigned  char*)pw_in, pw_len, NULL, NULL) != 1)
             return NULL;
 
         wkey_len = BIO_pending(wkey);
@@ -82,7 +84,7 @@ char *export_private_key(RSA *rsa, char *pw_in){
     }
 
     else{
-        if(PEM_write_bio_RSAPrivateKey(wkey, rsa, EVP_aes_256_cbc(), default_password, def_pw_len, NULL, NULL) != 1)
+        if(PEM_write_bio_RSAPrivateKey(wkey, rsa, EVP_aes_256_cbc(), (unsigned char*)default_password, def_pw_len, NULL, NULL) != 1)
             return NULL;
 
         wkey_len = BIO_pending(wkey);
