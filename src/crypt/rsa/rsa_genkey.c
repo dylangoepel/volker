@@ -8,6 +8,7 @@
 
 #define RSA_KEY_EXPO 65537
 #define MIN_PW_LENGTH 12
+#define DEFAULT_PASSWORD "d7fzsdifusdhfisf"
 
 // TODO: fix import_private_key and import_public_key
 
@@ -24,8 +25,6 @@ void __free(RSA *r, BIGNUM *bn, BIO *bio){
 
 int write_private_key(RSA *rsa, char *pw_in, char *fname){
     FILE *fw;
-    char *default_password = ")%e8pU6BL%H6WJ2>"; /*change it before spreading*/
-    int def_pw_len = strlen(default_password);
 
     if(pw_in != NULL){
         int pw_len = strlen(pw_in);
@@ -46,7 +45,7 @@ int write_private_key(RSA *rsa, char *pw_in, char *fname){
 
     else{
         fw = fopen(fname, "w");
-        if(PEM_write_RSAPrivateKey(fw, rsa, EVP_aes_256_cbc(), (unsigned char*)default_password, def_pw_len, NULL, NULL) != 1)
+        if(PEM_write_RSAPrivateKey(fw, rsa, EVP_aes_256_cbc(), (unsigned char*)DEFAULT_PASSWORD, strlen(DEFAULT_PASSWORD), NULL, NULL) != 1)
             return -5;
 
         fclose(fw);
@@ -58,8 +57,6 @@ int write_private_key(RSA *rsa, char *pw_in, char *fname){
 
 char *export_private_key(RSA *rsa, char *pw_in){
     BIO *wkey = BIO_new(BIO_s_mem());
-    char *default_password = ")%e8pU6BL%H6WJ2>"; /*change it before spreading*/
-    int def_pw_len = strlen(default_password);
     char *tmpc = NULL;
     size_t wkey_len;
 
@@ -84,7 +81,7 @@ char *export_private_key(RSA *rsa, char *pw_in){
     }
 
     else{
-        if(PEM_write_bio_RSAPrivateKey(wkey, rsa, EVP_aes_256_cbc(), (unsigned char*)default_password, def_pw_len, NULL, NULL) != 1)
+        if(PEM_write_bio_RSAPrivateKey(wkey, rsa, EVP_aes_256_cbc(), (unsigned char*)DEFAULT_PASSWORD, strlen(DEFAULT_PASSWORD), NULL, NULL) != 1)
             return NULL;
 
         wkey_len = BIO_pending(wkey);
