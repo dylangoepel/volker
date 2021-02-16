@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <openssl/rsa.h>
 
-#include "rsa_keygen.h"
+#include "crypto/rsa_genkey.h"
 #include "benchmark.h"
+
+RSA *generate_rsa_keys(unsigned int key_length);
 
 int main(){
     benchmark b;
@@ -12,7 +14,7 @@ int main(){
     char *pub_buff = NULL;
 
     bm_start(&b);
-    rsa = genearte_rsa_keys(4096);
+    rsa = generate_rsa_keys(4096);
     bm_end(&b);
     bm_write(&b, "generate 4096 key");
 
