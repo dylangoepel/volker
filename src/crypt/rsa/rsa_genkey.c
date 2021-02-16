@@ -100,10 +100,11 @@ char *export_private_key(RSA *rsa, char *pw_in){
 
 RSA *import_private_key(char *priv_key, char *pw_in){
 
+    return NULL;
 }
 
 RSA *import_public_key(char *pub_key){
-
+    return NULL;
 }
 
 char *export_public_key(RSA *pub){
