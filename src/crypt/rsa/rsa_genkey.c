@@ -8,7 +8,6 @@
 #define MIN_PW_LENGTH 12
 
 // TODO: fix import_private_key and import_public_key
-// everything else is working
 
 void __free(RSA *r, BIGNUM *bn, BIO *bio){
     if(r != NULL)
