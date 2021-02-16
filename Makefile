@@ -1,6 +1,6 @@
 cc := clang
 coflags :=  -pthread -Isrc/include $(shell if [ $${RELEASE:-0} -eq 1 ]; then echo -O3; else echo -g -O0; fi )
-cbflags := -pthread -lgmp -lssh 
+cbflags := -pthread -lgmp -lssh -lcrypto
 
 objs := $(shell find src -iname '*.c' | sed "s,src,obj,g; s,c$$,o,g" | grep -v "obj/main.o")
 
