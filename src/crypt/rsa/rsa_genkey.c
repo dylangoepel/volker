@@ -74,6 +74,10 @@ char *export_private_key(RSA *rsa, char *pw_in){
 
         wkey_len = BIO_pending(wkey);
         tmpc = malloc(wkey_len +1);
+
+        if (tmpc == NULL)
+            return NULL;
+
         BIO_read(wkey, tmpc, wkey_len);
 
         __free(NULL, NULL, wkey);
@@ -86,6 +90,9 @@ char *export_private_key(RSA *rsa, char *pw_in){
 
         wkey_len = BIO_pending(wkey);
         tmpc = malloc(wkey_len +1);
+        if(tmpc == NULL)
+            retunr NULL;
+
         BIO_read(wkey, tmpc, wkey_len);
 
         __free(NULL, NULL, wkey);
