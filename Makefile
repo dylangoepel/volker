@@ -15,7 +15,8 @@ objects: $(objs)
 
 clean:
 	rm -f $(objs) $(testbin) bin/volker
-	rm -rf bin/test.pem
+	rm -f bin/bm_*
+	rm -f bin/test_*
 	rm -f compile_flags.txt
 	rm -f test.pem
 	rm -f dat/*.dat
