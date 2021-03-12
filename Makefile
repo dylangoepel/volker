@@ -9,13 +9,14 @@ benchbin := $(shell find benchmarks -iname '*.c' | sed "s,benchmarks/,bin/bm_,g;
 
 .PHONY: all objects clean
 
-all: $(objs) $(testsbin) $(benchbin) obj/main.o bin/volker
+all: compile_flags.txt $(objs) $(testsbin) $(benchbin) obj/main.o bin/volker
 
 objects: $(objs)
 
 clean:
 	rm -f $(objs) $(testbin) bin/volker
 	rm -rf bin/test.pem
+	rm -f compile_flags.txt
 
 obj/%.o: src/%.c
 	mkdir -p $(shell dirname $< | sed 's,src,obj,g')
@@ -43,3 +44,6 @@ bm: benchmarks
 
 test: tests
 	for test in bin/test*; do echo -e "\033[32m[+]" running $$test "\033[00m"; $$test || echo -e "\033[31m[-] returned error: $$? \033[00m"; done
+
+compile_flags.txt:
+	for flag in $(coflags) $(cbflags); do echo $$flag; done > compile_flags.txt
