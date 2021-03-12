@@ -18,6 +18,7 @@ clean:
 	rm -rf bin/test.pem
 	rm -f compile_flags.txt
 	rm -f test.pem
+	rm -f dat/*.dat
 
 obj/%.o: src/%.c
 	mkdir -p $(shell dirname $< | sed 's,src,obj,g')
