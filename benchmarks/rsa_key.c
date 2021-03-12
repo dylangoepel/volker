@@ -21,12 +21,12 @@ int main(){
     bm_start(&b);
     priv_buff = export_private_key(rsa, "fu7zdttgfuszdgfs");
     bm_end(&b);
-    bm_write(&b, "safed 4096 private key + encryption (without default key)");
+    bm_write(&b, "saved 4096 private key + encryption (without default key)");
 
     bm_start(&b);
     priv_buff_wo = export_private_key(rsa, NULL);
     bm_end(&b);
-    bm_write(&b, "safed 4096 private key + encryption (with default key)");
+    bm_write(&b, "saved 4096 private key + encryption (with default key)");
 
     bm_start(&b);
     pub_buff = export_public_key(rsa);
