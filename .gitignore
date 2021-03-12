@@ -2,3 +2,4 @@ obj
 bin
 dat/*.dat
 .projectile
+compile_flags.txt
