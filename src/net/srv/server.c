@@ -74,4 +74,3 @@ int srv_listen(srv_ctx *server, void*(*handler)(void *)) {
     tpool_destroy(&main_pool, 1);
     return -1;
 }
-
