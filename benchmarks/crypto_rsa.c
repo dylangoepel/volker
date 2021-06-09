@@ -5,8 +5,6 @@
 #include "crypto/rsa.h"
 #include "benchmark.h"
 
-RSA *generate_rsa_keys(unsigned int key_length);
-
 int main(){
     benchmark b;
     crypto_rsa_t *rsa;
