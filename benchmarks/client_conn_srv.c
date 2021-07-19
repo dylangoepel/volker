@@ -12,6 +12,7 @@
 #include "benchmark.h"
 
 #define MSG_LENGHT 20
+#define SRV_PORT 5632
 
 int snd_msg(client_conn_ctx * arg){
   char msg[MSG_LENGHT] = "Test Nachricht";
@@ -54,7 +55,7 @@ void *rcv_msg(void *arg){
 void *server(){
   srv_ctx main;
   
-  if(srv_init(&main) < 0)
+  if(srv_init(&main, SRV_PORT) < 0)
     printf("%s","Error in srv_init");
 
   if(srv_listen(&main, &rcv_msg) < 0)
