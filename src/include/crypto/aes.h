@@ -13,6 +13,7 @@
 #define CRYPTO_AES_MODE_256 256
 #define CRYPTO_AES_MODE_192 192
 #define CRYPTO_AES_MODE_128 128
+#define CRYPTO_AES_IV_SIZE 16
 
 struct crypto_aes_t {
     int ctxcnt;

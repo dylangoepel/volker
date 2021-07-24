@@ -8,12 +8,12 @@ int main(){
     benchmark b;
     crypto_aes_t *aes_enc, *aes_dec;
     unsigned char key[32];
-    unsigned char iv[32];
+    unsigned char iv[16];
     char *msg = "THIS IS A TEST MESSAGE";
     char *w_buff;
 
     RAND_bytes(key, CRYPTO_AES_KEY_SIZE_256);
-    RAND_bytes(iv, CRYPTO_AES_KEY_SIZE_256);
+    RAND_bytes(iv, CRYPTO_AES_IV_SIZE);
 
     aes_enc = crypto_aes_new_cipher(CRYPTO_AES_MODE_ENCRYPTION);
     int err = crypto_aes_set_key_and_iv(aes_enc, key, iv, CRYPTO_AES_MODE_256);
